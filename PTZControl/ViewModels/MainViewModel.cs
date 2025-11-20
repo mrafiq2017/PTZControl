@@ -189,7 +189,7 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void StopMotor()
     {
-        HexString = "ff 04 00 00 " + PanSpeed + " " + TiltSpeed;
+        HexString = "ff 04 00 00 00 00";
         SendHex();
     }
 
