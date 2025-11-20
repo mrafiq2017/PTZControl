@@ -100,7 +100,6 @@
                 Padding="28,20"
                 Margin="0,10,0,10"
                 HorizontalAlignment="Center"
-                BoxShadow="0 4 20 0 #20000000"
                 Grid.Row="1">
             
             <StackPanel Orientation="Horizontal"
@@ -151,9 +150,10 @@
                         Grid.Row="1"
                         Margin="20 10 0 0"
                         Padding="10 10 10 10"
-                        BoxShadow="0 10 40 0 #80000000"
                         HorizontalAlignment="Left"
                         VerticalAlignment="Center"
+                        BorderBrush="#E0E0E0"
+                        BorderThickness="1"
                         Width="750">
             
                     <Grid ColumnDefinitions="*,*,*" RowDefinitions="*,*,*">
@@ -326,14 +326,15 @@
                             Command="{Binding ZoomOutDTVCommand}"
                             Margin="-25 0 0 0"
                             CornerRadius="10"/>
-
-                    <Button Content="Zoom In IR" HorizontalContentAlignment="Center"  
-                            Height="35"
-                            Command="{Binding ZoomInIRCommand}"
+                    
+                    <Button Content="Narrow FOV" Height="35" HorizontalContentAlignment="Center" 
+                            Command="{Binding ZoomOutIRCommand}"
                             Margin="20 0 0 0"
                             CornerRadius="10"/>
-                    <Button Content="Zoom Out IR" Height="35" HorizontalContentAlignment="Center" 
-                            Command="{Binding ZoomOutIRCommand}"
+
+                    <Button Content="Wide FOV" HorizontalContentAlignment="Center"  
+                            Height="35"
+                            Command="{Binding ZoomInIRCommand}"
                             Margin="-25 0 0 0"
                             CornerRadius="10"/>
 

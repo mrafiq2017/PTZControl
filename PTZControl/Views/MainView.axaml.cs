@@ -31,4 +31,8 @@ public partial class MainView : UserControl
     private void UserControl_ActualThemeVariantChanged(object? sender, EventArgs e)
     {
     }
+
+    private void Border_ActualThemeVariantChanged(object? sender, EventArgs e)
+    {
+    }
 }
