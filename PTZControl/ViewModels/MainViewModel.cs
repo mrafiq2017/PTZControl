@@ -38,10 +38,10 @@ public partial class MainViewModel : ViewModelBase
     private bool isConnected = false;
 
     [ObservableProperty]
-    private string panSpeed;
+    private string panSpeed = "00";
 
     [ObservableProperty]
-    private string tiltSpeed;
+    private string tiltSpeed = "00";
 
     public MainViewModel()
     {
