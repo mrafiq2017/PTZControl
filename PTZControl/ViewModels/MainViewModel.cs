@@ -196,27 +196,27 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void ZoomInIR()
     {
-        int currentZoom = ZoomDefaultIRValue;
-        int step = int.Parse(ZoomIRValue);
-        currentZoom += step;
-        ZoomDefaultIRValue = currentZoom;
-        string hex = currentZoom.ToString("X4");
-        string result = hex.Insert(2, " ");
-        HexString = $"ff 02 00 4f {result}";
+        //int currentZoom = ZoomDefaultIRValue;
+        //int step = int.Parse(ZoomIRValue);
+        //currentZoom += step;
+        //ZoomDefaultIRValue = currentZoom;
+        //string hex = currentZoom.ToString("X4");
+        //string result = hex.Insert(2, " ");
+        HexString = $"ff 02 00 20 00 00";
         SendHex();
     }
 
     [RelayCommand]
     private void ZoomOutIR()
     {
-        int currentZoom = ZoomDefaultIRValue;
-        int step = int.Parse(ZoomIRValue);
-        currentZoom -= step;
-        if (currentZoom < 0) currentZoom = 0;
-        ZoomDefaultIRValue = currentZoom;
-        string hex = currentZoom.ToString("X4");
-        string result = hex.Insert(2, " ");
-        HexString = $"ff 01 00 4f {result}";
+        //int currentZoom = ZoomDefaultIRValue;
+        //int step = int.Parse(ZoomIRValue);
+        //currentZoom -= step;
+        //if (currentZoom < 0) currentZoom = 0;
+        //ZoomDefaultIRValue = currentZoom;
+        //string hex = currentZoom.ToString("X4");
+        //string result = hex.Insert(2, " ");
+        HexString = $"ff 02 00 40 00 00";
         SendHex();
     }
 

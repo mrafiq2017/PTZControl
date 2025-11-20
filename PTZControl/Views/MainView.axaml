@@ -327,25 +327,10 @@
                             Margin="-25 0 0 0"
                             CornerRadius="10"/>
 
-                    <TextBlock Text="IR Zoom"
-                           FontSize="14"
-                           FontWeight="SemiBold"
-                           VerticalAlignment="Center"/>
-                    <TextBox Width="60"
-                             Height="38"
-                             FontSize="14"
-                             Text="{Binding ZoomIRValue}"
-                             CornerRadius="10"
-                             Background="#FAFAFA"
-                             Margin="-25 0 0 0"
-                             BorderBrush="#CCCCCC"
-                             BorderThickness="1"
-                             VerticalContentAlignment="Center"/>
-
                     <Button Content="Zoom In IR" HorizontalContentAlignment="Center"  
                             Height="35"
                             Command="{Binding ZoomInIRCommand}"
-                            Margin="-20 0 0 0"
+                            Margin="20 0 0 0"
                             CornerRadius="10"/>
                     <Button Content="Zoom Out IR" Height="35" HorizontalContentAlignment="Center" 
                             Command="{Binding ZoomOutIRCommand}"
