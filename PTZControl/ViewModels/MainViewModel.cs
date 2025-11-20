@@ -26,9 +26,6 @@ public partial class MainViewModel : ViewModelBase
     private string hexString;
 
     [ObservableProperty]
-    private string selectedComPort = "1470";
-
-    [ObservableProperty]
     private int selectedBaudRate;
 
     [ObservableProperty]
@@ -42,6 +39,12 @@ public partial class MainViewModel : ViewModelBase
 
     [ObservableProperty]
     private string tiltSpeed = "00";
+
+    [ObservableProperty]
+    private string port = "1470";
+
+    [ObservableProperty]
+    private string tcpPort = "1470";
 
     public MainViewModel()
     {
@@ -61,12 +64,12 @@ public partial class MainViewModel : ViewModelBase
                 foreach (var port in ports)
                     ComPorts.Add(port);
 
-                SelectedComPort = "";
+                Port = "";
             }
             else
             {
                 ComPorts.Add("No COM ports found");
-                SelectedComPort = ComPorts.First();
+                Port = ComPorts.First();
             }
         }
         catch (Exception ex)
@@ -99,7 +102,11 @@ public partial class MainViewModel : ViewModelBase
     {
         try
         {
-            int.TryParse(SelectedComPort, out int port);
+            if (string.IsNullOrEmpty(TcpPort))
+            {
+                TcpPort = "1470";
+            }
+            int.TryParse(TcpPort, out int port);
 
             _tcpClient = new TcpClient();
             //await _tcpClient.ConnectAsync(IpAddress, port);
@@ -162,6 +169,34 @@ public partial class MainViewModel : ViewModelBase
 
     [RelayCommand]
     private void StopMotor()
+    {
+        HexString = "ff 04 00 00 " + PanSpeed + " " + TiltSpeed;
+        SendHex();
+    }
+
+    [RelayCommand]
+    private void ZoomInIR()
+    {
+        HexString = "ff 04 00 00 " + PanSpeed + " " + TiltSpeed;
+        SendHex();
+    }
+
+    [RelayCommand]
+    private void ZoomOutIR()
+    {
+        HexString = "ff 04 00 00 " + PanSpeed + " " + TiltSpeed;
+        SendHex();
+    }
+
+    [RelayCommand]
+    private void ZoomInDTV()
+    {
+        HexString = "ff 04 00 00 " + PanSpeed + " " + TiltSpeed;
+        SendHex();
+    }
+
+    [RelayCommand]
+    private void ZoomOutDTV()
     {
         HexString = "ff 04 00 00 " + PanSpeed + " " + TiltSpeed;
         SendHex();

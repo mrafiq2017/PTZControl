@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:PTZControl.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
              x:Class="PTZControl.Views.MainView"
              x:DataType="vm:MainViewModel">
   
@@ -50,12 +50,12 @@
                          Height="38"
                          Padding="12,0"
                          FontSize="14"
-                         Text="{Binding SelectedComPort}"
                          CornerRadius="10"
                          Background="#FAFAFA"
                          BorderBrush="#CCCCCC"
                          BorderThickness="1"
                          Watermark="1470"
+                         Text="{Binding TcpPort}"
                          VerticalContentAlignment="Center"/>
 
                 <!-- Baud Rate -->
@@ -144,7 +144,7 @@
         <Border CornerRadius="0"
                 Grid.Row="2">
 
-            <Grid ColumnDefinitions="*, *" RowDefinitions="*,*" HorizontalAlignment="Stretch" >
+            <Grid ColumnDefinitions="*, *" RowDefinitions="*,*, *" HorizontalAlignment="Stretch" >
         
                 <!-- LEFT: PTZ Joystick (fixed width, perfectly centered) -->
                 <Border CornerRadius="20"
@@ -181,7 +181,7 @@
                                 CornerRadius="24"
                                 Width="100" Height="40"
                                 Command="{Binding MoveLeftCommand}"
-                                Margin="150 0 10 0"
+                                Margin="200 0 10 0"
                                 HorizontalContentAlignment="Center"
                                 CommandParameter="Left">
                             <Button.Styles>
@@ -214,7 +214,7 @@
                                 Width="100" Height="40"
                                 Command="{Binding MoveRightCommand}"
                                 HorizontalContentAlignment="Center"
-                                Margin="-120 0 0 0"
+                                Margin="-100 0 0 0"
                                 CommandParameter="Right">
                             <Button.Styles>
                                 <Style Selector="Button:pointerover"> <Setter Property="Background" Value="#0078D4"/> </Style>
@@ -285,6 +285,40 @@
                                  VerticalContentAlignment="Center"/>
                     </Grid>
                 </Border>
+
+                <Border CornerRadius="20"
+                        Background="White"
+                        BorderBrush="#CCCCCC"
+                        BorderThickness="1"
+                        Padding="20"
+                        Margin="20 10 0 0"
+                        HorizontalAlignment="Left"
+                        Width="750"
+                        Grid.Row="2">
+
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Spacing="30">
+
+                    <Button Content="Zoom In DTV" HorizontalContentAlignment="Center"  
+                            Height="35"
+                            Command="{Binding ZoomInDTVCommand}"
+                            CornerRadius="10"/>
+                    <Button Content="Zoom Out DTV" Height="35" HorizontalContentAlignment="Center" 
+                            Command="{Binding ZoomOutDTVCommand}"
+                            CornerRadius="10"/>
+
+                    <Button Content="Zoom In IR" HorizontalContentAlignment="Center"  
+                            Height="35"
+                            Command="{Binding ZoomInIRCommand}"
+                            CornerRadius="10"/>
+                    <Button Content="Zoom Out" Height="35" HorizontalContentAlignment="Center" 
+                            Command="{Binding ZoomOutIRCommand}"
+                            CornerRadius="10"/>
+
+                </StackPanel>
+            </Border>
         
             </Grid>
         </Border>
