@@ -1,0 +1,293 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:PTZControl.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="PTZControl.Views.MainView"
+             x:DataType="vm:MainViewModel">
+  
+    <Grid RowDefinitions="Auto,Auto,Auto,*" Margin="0">
+        
+        <!-- Connection Bar - Top Center -->
+        <Border Background="White"
+                CornerRadius="12"
+                BorderBrush="#E0E0E0"
+                BorderThickness="1"
+                Padding="140,20"
+                Margin="0,10,0,10"
+                HorizontalAlignment="Center"
+                BoxShadow="0 4 20 0 #20000000"
+                Grid.Row="0">
+            
+            <StackPanel Orientation="Horizontal"
+                        VerticalAlignment="Center"
+                        Spacing="20">
+
+                <!-- IP Address -->
+                <TextBlock Text="IP Address:"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"/>
+                <TextBox Width="170"
+                         Height="38"
+                         Padding="12,0"
+                         FontSize="14"
+                         Text="{Binding IpAddress}"
+                         CornerRadius="10"
+                         Background="#FAFAFA"
+                         BorderBrush="#CCCCCC"
+                         BorderThickness="1"
+                         Watermark="192.168.1.100"
+                         VerticalContentAlignment="Center"/>
+
+                <!-- Port -->
+                <TextBlock Text="Port:"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"/>
+                <TextBox Width="170"
+                         Height="38"
+                         Padding="12,0"
+                         FontSize="14"
+                         Text="{Binding SelectedComPort}"
+                         CornerRadius="10"
+                         Background="#FAFAFA"
+                         BorderBrush="#CCCCCC"
+                         BorderThickness="1"
+                         Watermark="1470"
+                         VerticalContentAlignment="Center"/>
+
+                <!-- Baud Rate -->
+                <!--<TextBlock Text="Baud Rate:"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"/>
+                <ComboBox Width="130"
+                          Height="38"
+                          FontSize="14"
+                          ItemsSource="{Binding BaudRates}"
+                          SelectedItem="{Binding SelectedBaudRate}"
+                          SelectionChanged="OnValueChange"
+                          PlaceholderText="9600"
+                          CornerRadius="10"
+                          Background="#FAFAFA"
+                          BorderBrush="#CCCCCC"
+                          VerticalContentAlignment="Center"
+                          Padding="12,0"/>-->
+
+                <!--<Button Content="{Binding ConnectionStatus}"
+                    Width="120"
+                    Height="38"
+                    FontSize="14"
+                    FontWeight="SemiBold"
+                    CornerRadius="10"
+                    BorderThickness="0"
+                    Cursor="Hand"
+                    Command="{Binding ConnectCommand}"
+                    VerticalAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center">
+            </Button>-->
+
+            </StackPanel>
+        </Border>
+        
+        <Border Background="White"
+                CornerRadius="12"
+                BorderBrush="#E0E0E0"
+                BorderThickness="1"
+                Padding="28,20"
+                Margin="0,10,0,10"
+                HorizontalAlignment="Center"
+                BoxShadow="0 4 20 0 #20000000"
+                Grid.Row="1">
+            
+            <StackPanel Orientation="Horizontal"
+                        VerticalAlignment="Top"
+                        Spacing="20">
+
+                 <!-- Hex String -->
+                <TextBlock Text="HEX"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"/>
+                <TextBox Width="515"
+                         Height="38"
+                         Padding="12,0"
+                         FontSize="14"
+                         Text="{Binding HexString}"
+                         CornerRadius="10"
+                         Background="#FAFAFA"
+                         BorderBrush="#CCCCCC"
+                         BorderThickness="1"
+                         VerticalContentAlignment="Center"/>
+
+                <Button Content="Send"
+                        Width="120"
+                        Height="38"
+                        FontSize="14"
+                        FontWeight="SemiBold"
+                        CornerRadius="10"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        Command="{Binding SendHexCommand}"
+                        VerticalAlignment="Center"
+                        HorizontalContentAlignment="Center"
+                        VerticalContentAlignment="Center">
+                </Button>
+
+            </StackPanel>
+        </Border>
+
+        <!-- Full-width dark control bar – exactly what you want -->
+        <Border CornerRadius="0"
+                Grid.Row="2">
+
+            <Grid ColumnDefinitions="*, *" RowDefinitions="*,*" HorizontalAlignment="Stretch" >
+        
+                <!-- LEFT: PTZ Joystick (fixed width, perfectly centered) -->
+                <Border CornerRadius="20"
+                        Grid.Row="1"
+                        Margin="20 10 0 0"
+                        Padding="10 10 10 10"
+                        BoxShadow="0 10 40 0 #80000000"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Width="750">
+            
+                    <Grid ColumnDefinitions="*,*,*" RowDefinitions="*,*,*">
+                
+                        <!-- Up Arrow -->
+                        <Button Grid.Row="0" Grid.Column="1"
+                                Content="Up"
+                                FontSize="16"
+                                CornerRadius="24"
+                                HorizontalContentAlignment="Center"
+                                Width="100" Height="40"
+                                Command="{Binding MoveUpCommand}"
+                                Margin="0 0 0 10"
+                                CommandParameter="Up">
+                            <Button.Styles>
+                                <Style Selector="Button:pointerover"> <Setter Property="Background" Value="#0078D4"/> </Style>
+                                <Style Selector="Button:pressed">   <Setter Property="Background" Value="#005A9E"/> </Style>
+                            </Button.Styles>
+                        </Button>
+
+                        <!-- Left Arrow -->
+                        <Button Grid.Row="1" Grid.Column="0"
+                                Content="Left"
+                                FontSize="16"
+                                CornerRadius="24"
+                                Width="100" Height="40"
+                                Command="{Binding MoveLeftCommand}"
+                                Margin="150 0 10 0"
+                                HorizontalContentAlignment="Center"
+                                CommandParameter="Left">
+                            <Button.Styles>
+                                <Style Selector="Button:pointerover"> <Setter Property="Background" Value="#0078D4"/> </Style>
+                                <Style Selector="Button:pressed">   <Setter Property="Background" Value="#005A9E"/> </Style>
+                            </Button.Styles>
+                        </Button>
+
+                        <!-- STOP (Big Red) -->
+                        <Button Grid.Row="1" Grid.Column="1"
+                                Content="STOP"
+                                FontSize="16"
+                                CornerRadius="50"
+                                Width="100" Height="40"
+                                HorizontalContentAlignment="Center"
+                                Margin="0 0 0 0"
+                                Command="{Binding StopMotorCommand}">
+                            <Button.Styles>
+                                <Style Selector="Button:pressed">
+                                    <Setter Property="Background" Value="#B71C1C"/>
+                                </Style>
+                            </Button.Styles>
+                        </Button>
+
+                        <!-- Right Arrow -->
+                        <Button Grid.Row="1" Grid.Column="2"
+                                Content="Right"
+                                FontSize="16"
+                                CornerRadius="24"
+                                Width="100" Height="40"
+                                Command="{Binding MoveRightCommand}"
+                                HorizontalContentAlignment="Center"
+                                Margin="-120 0 0 0"
+                                CommandParameter="Right">
+                            <Button.Styles>
+                                <Style Selector="Button:pointerover"> <Setter Property="Background" Value="#0078D4"/> </Style>
+                                <Style Selector="Button:pressed">   <Setter Property="Background" Value="#005A9E"/> </Style>
+                            </Button.Styles>
+                        </Button>
+
+                        <!-- Down Arrow -->
+                        <Button Grid.Row="2" Grid.Column="1"
+                                Content="Down"
+                                FontSize="16"
+                                CornerRadius="24"
+                                Width="100" Height="40"
+                                Command="{Binding MoveDownCommand}"
+                                HorizontalContentAlignment="Center"
+                                Margin="0 10 0 0"
+                                CommandParameter="Down">
+                            <Button.Styles>
+                                <Style Selector="Button:pointerover"> <Setter Property="Background" Value="#0078D4"/> </Style>
+                                <Style Selector="Button:pressed">   <Setter Property="Background" Value="#005A9E"/> </Style>
+                            </Button.Styles>
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <!-- RIGHT: Empty space for future controls (speed sliders, presets, zoom, etc.) -->
+                 <Border CornerRadius="20"
+                         Grid.Column="0"
+                        Margin="20 10 0 0"
+                        Padding="10 10 10 10"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Width="750">
+            
+                    <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="*,*">
+
+                        <TextBlock Text="Pan Speed"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"
+                           Margin="50 0 0 0"
+                           Grid.Column="1"/>
+                        <TextBox Width="170"
+                                 Height="38"
+                                 Padding="12,0"
+                                 FontSize="14"
+                                 Margin="180 0 0 0"
+                                 Text="{Binding PanSpeed}"
+                                 CornerRadius="10"
+                                 BorderThickness="1"
+                                 Grid.Column="1"
+                                 VerticalContentAlignment="Center"/>
+
+                        <TextBlock Text="Tilt Speed"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           Grid.Column="0"
+                           VerticalAlignment="Center"/>
+                        <TextBox Width="170"
+                                 Height="38"
+                                 Padding="12,0"
+                                 FontSize="14"
+                                 Margin="100 0 0 0"
+                                 Grid.Column="0"
+                                 Text="{Binding TiltSpeed}"
+                                 CornerRadius="10"
+                                 BorderThickness="1"
+                                 VerticalContentAlignment="Center"/>
+                    </Grid>
+                </Border>
+        
+            </Grid>
+        </Border>
+
+    </Grid>
+</UserControl>
