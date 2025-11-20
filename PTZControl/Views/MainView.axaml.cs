@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Input;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using PTZControl.ViewModels;
 

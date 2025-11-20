@@ -6,6 +6,10 @@ using System.IO.Ports;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -45,6 +49,18 @@ public partial class MainViewModel : ViewModelBase
 
     [ObservableProperty]
     private string tcpPort = "1470";
+
+    [ObservableProperty]
+    private string zoomDTVValue = "0";
+
+    [ObservableProperty]
+    private string zoomIRValue = "0";
+
+    [ObservableProperty]
+    private int zoomDefaultDTVValue = 0;
+
+    [ObservableProperty]
+    private int zoomDefaultIRValue = 0;
 
     public MainViewModel()
     {
@@ -108,9 +124,12 @@ public partial class MainViewModel : ViewModelBase
             }
             int.TryParse(TcpPort, out int port);
 
-            _tcpClient = new TcpClient();
-            //await _tcpClient.ConnectAsync(IpAddress, port);
-            //_stream = _tcpClient.GetStream();
+            if (_tcpClient == null)
+            {
+                _tcpClient = new TcpClient();
+                await _tcpClient.ConnectAsync(IpAddress, port);
+                _stream = _tcpClient.GetStream();
+            }
 
             if (!string.IsNullOrEmpty(HexString))
             {
@@ -177,28 +196,54 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void ZoomInIR()
     {
-        HexString = "ff 04 00 00 " + PanSpeed + " " + TiltSpeed;
+        int currentZoom = ZoomDefaultIRValue;
+        int step = int.Parse(ZoomIRValue);
+        currentZoom += step;
+        ZoomDefaultIRValue = currentZoom;
+        string hex = currentZoom.ToString("X4");
+        string result = hex.Insert(2, " ");
+        HexString = $"ff 02 00 4f {result}";
         SendHex();
     }
 
     [RelayCommand]
     private void ZoomOutIR()
     {
-        HexString = "ff 04 00 00 " + PanSpeed + " " + TiltSpeed;
+        int currentZoom = ZoomDefaultIRValue;
+        int step = int.Parse(ZoomIRValue);
+        currentZoom -= step;
+        if (currentZoom < 0) currentZoom = 0;
+        ZoomDefaultIRValue = currentZoom;
+        string hex = currentZoom.ToString("X4");
+        string result = hex.Insert(2, " ");
+        HexString = $"ff 01 00 4f {result}";
         SendHex();
     }
 
     [RelayCommand]
     private void ZoomInDTV()
     {
-        HexString = "ff 04 00 00 " + PanSpeed + " " + TiltSpeed;
+        int currentZoom = ZoomDefaultDTVValue;
+        int step = int.Parse(ZoomDTVValue);
+        currentZoom += step;
+        ZoomDefaultDTVValue = currentZoom;
+        string hex = currentZoom.ToString("X4");
+        string result = hex.Insert(2, " ");
+        HexString = $"ff 01 00 4f {result}";
         SendHex();
     }
 
     [RelayCommand]
     private void ZoomOutDTV()
     {
-        HexString = "ff 04 00 00 " + PanSpeed + " " + TiltSpeed;
+        int currentZoom = ZoomDefaultDTVValue;
+        int step = int.Parse(ZoomDTVValue);
+        currentZoom -= step;
+        if (currentZoom < 0) currentZoom = 0;
+        ZoomDefaultDTVValue = currentZoom;
+        string hex = currentZoom.ToString("X4");
+        string result = hex.Insert(2, " ");
+        HexString = $"ff 01 00 4f {result}";
         SendHex();
     }
 
@@ -213,33 +258,39 @@ public partial class MainViewModel : ViewModelBase
         
     }
 
-    private byte[]? HexStringTo7Bytes(string input)
+    private byte[]? HexStringTo7Bytes(string hexInput)
     {
+        if (string.IsNullOrWhiteSpace(hexInput)) return null;
+
+        var cleaned = Regex.Replace(hexInput, @"[^0-9A-Fa-f ]", " ").Trim();
+        var parts = cleaned.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+        if (parts.Length != 5 && parts.Length != 6) return null;
+
         try
         {
-            var cleaned = Regex.Replace(input, @"[^0-9A-Fa-f ]", "").Trim();
-            var parts = cleaned.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            byte[] bytes = parts.Select(p => Convert.ToByte(p, 16)).ToArray();
 
-            if (parts.Length < 6 || parts.Length > 6) return null; // Must have exactly 6 bytes before checksum
+            byte[] packet = new byte[7];
+            int startIndex = 0;
 
-            byte[] data = new byte[6];
-            for (int i = 0; i < 6; i++)
-                data[i] = Convert.ToByte(parts[i], 16);
+            if (bytes.Length == 6 && bytes[0] == 0xFF)
+            {
+                Array.Copy(bytes, packet, 6);
+                startIndex = 1;
+            }
+            else
+            {
+                packet[0] = 0xFF;
+                Array.Copy(bytes, 0, packet, 1, 5);
+                startIndex = 1;
+            }
 
-            // Must start with FF 04
-            if (data[0] != 0xFF || data[1] != 0x04) return null;
-
-            // Calculate checksum: XOR of bytes 2 to 5
-            byte checksum = data[2];
+            byte checksum = 0;
             for (int i = 1; i <= 5; i++)
-                checksum ^= data[i];
-            checksum ^= data[5];
+                checksum += packet[i];
 
-            // Full 7-byte packet
-            byte[] packet = new byte[] { data[0], data[1], data[2], data[3], data[4], data[5], checksum };
-
-            // Update HexString to show full command with checksum
-            HexString = string.Join(" ", packet.Select(b => b.ToString("X2")));
+            packet[6] = checksum;
 
             return packet;
         }

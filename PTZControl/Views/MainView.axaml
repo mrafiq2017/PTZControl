@@ -162,7 +162,7 @@
                         <Button Grid.Row="0" Grid.Column="1"
                                 Content="Up"
                                 FontSize="16"
-                                CornerRadius="24"
+                                CornerRadius="10"
                                 HorizontalContentAlignment="Center"
                                 Width="100" Height="40"
                                 Command="{Binding MoveUpCommand}"
@@ -178,7 +178,7 @@
                         <Button Grid.Row="1" Grid.Column="0"
                                 Content="Left"
                                 FontSize="16"
-                                CornerRadius="24"
+                                CornerRadius="10"
                                 Width="100" Height="40"
                                 Command="{Binding MoveLeftCommand}"
                                 Margin="200 0 10 0"
@@ -210,12 +210,13 @@
                         <Button Grid.Row="1" Grid.Column="2"
                                 Content="Right"
                                 FontSize="16"
-                                CornerRadius="24"
+                                CornerRadius="10"
                                 Width="100" Height="40"
                                 Command="{Binding MoveRightCommand}"
                                 HorizontalContentAlignment="Center"
                                 Margin="-100 0 0 0"
-                                CommandParameter="Right">
+                                CommandParameter="Right"
+                                Tag="Right">
                             <Button.Styles>
                                 <Style Selector="Button:pointerover"> <Setter Property="Background" Value="#0078D4"/> </Style>
                                 <Style Selector="Button:pressed">   <Setter Property="Background" Value="#005A9E"/> </Style>
@@ -226,7 +227,7 @@
                         <Button Grid.Row="2" Grid.Column="1"
                                 Content="Down"
                                 FontSize="16"
-                                CornerRadius="24"
+                                CornerRadius="10"
                                 Width="100" Height="40"
                                 Command="{Binding MoveDownCommand}"
                                 HorizontalContentAlignment="Center"
@@ -301,20 +302,54 @@
                             VerticalAlignment="Center"
                             Spacing="30">
 
+                <TextBlock Text="DTV Zoom"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"/>
+                <TextBox Width="60"
+                         Height="38"
+                         FontSize="14"
+                         Text="{Binding ZoomDTVValue}"
+                         CornerRadius="10"
+                         Background="#FAFAFA"
+                         BorderBrush="#CCCCCC"
+                         Margin="-25 0 0 0"
+                         BorderThickness="1"
+                         VerticalContentAlignment="Center"/>
+
                     <Button Content="Zoom In DTV" HorizontalContentAlignment="Center"  
                             Height="35"
                             Command="{Binding ZoomInDTVCommand}"
+                            Margin="-20 0 0 0"
                             CornerRadius="10"/>
                     <Button Content="Zoom Out DTV" Height="35" HorizontalContentAlignment="Center" 
                             Command="{Binding ZoomOutDTVCommand}"
+                            Margin="-25 0 0 0"
                             CornerRadius="10"/>
+
+                    <TextBlock Text="IR Zoom"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"/>
+                    <TextBox Width="60"
+                             Height="38"
+                             FontSize="14"
+                             Text="{Binding ZoomIRValue}"
+                             CornerRadius="10"
+                             Background="#FAFAFA"
+                             Margin="-25 0 0 0"
+                             BorderBrush="#CCCCCC"
+                             BorderThickness="1"
+                             VerticalContentAlignment="Center"/>
 
                     <Button Content="Zoom In IR" HorizontalContentAlignment="Center"  
                             Height="35"
                             Command="{Binding ZoomInIRCommand}"
+                            Margin="-20 0 0 0"
                             CornerRadius="10"/>
-                    <Button Content="Zoom Out" Height="35" HorizontalContentAlignment="Center" 
+                    <Button Content="Zoom Out IR" Height="35" HorizontalContentAlignment="Center" 
                             Command="{Binding ZoomOutIRCommand}"
+                            Margin="-25 0 0 0"
                             CornerRadius="10"/>
 
                 </StackPanel>
