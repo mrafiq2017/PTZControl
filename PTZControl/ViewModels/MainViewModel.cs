@@ -62,6 +62,21 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     private int zoomDefaultIRValue = 0;
 
+    [ObservableProperty]
+    private string tcpReply = "";
+
+    [ObservableProperty]
+    private string focusDTVValue = "0";
+
+    [ObservableProperty]
+    private string focusIRValue = "0";
+
+    [ObservableProperty]
+    private int focusDefaultDTVValue = 0;
+
+    [ObservableProperty]
+    private int focusDefaultIRValue = 0;
+
     public MainViewModel()
     {
         LoadComPorts();
@@ -118,6 +133,7 @@ public partial class MainViewModel : ViewModelBase
     {
         try
         {
+            TcpReply = "";
             if (string.IsNullOrEmpty(TcpPort))
             {
                 TcpPort = "1470";
@@ -129,6 +145,7 @@ public partial class MainViewModel : ViewModelBase
                 _tcpClient = new TcpClient();
                 await _tcpClient.ConnectAsync(IpAddress, port);
                 _stream = _tcpClient.GetStream();
+                StartReceiving();
             }
 
             if (!string.IsNullOrEmpty(HexString))
@@ -158,31 +175,70 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
+    private async void StartReceiving()
+    {
+        byte[] buffer = new byte[1024];
+
+        try
+        {
+            while (_tcpClient?.Connected == true)
+            {
+                int bytesRead = await _stream.ReadAsync(buffer, 0, buffer.Length);
+                if (bytesRead == 0)
+                    break;
+
+                // Convert to HEX exactly like the ones you send
+                string hex = BitConverter.ToString(buffer, 0, bytesRead)
+                                         .Replace("-", " ")
+                                         .ToLower(); // remove if you want uppercase
+
+                // Append to your UI log
+                TcpReply += $"Receive : {DateTime.Now:HH:mm:ss}  {hex}\n" + System.Environment.NewLine;
+            }
+        }
+        catch (Exception ex)
+        {
+            TcpReply += $"Receive error: {ex.Message}\n" + System.Environment.NewLine;
+        }
+    }
+
     [RelayCommand]
     private void MoveUp()
     {
-        HexString = "ff 04 00 08 " + PanSpeed + " " + TiltSpeed;
+        if (string.IsNullOrEmpty(TiltSpeed))
+            TiltSpeed = "00";
+
+        HexString = "ff 04 00 08 00 " + int.Parse(TiltSpeed).ToString("D2");
         SendHex();
     }
 
     [RelayCommand]
     private void MoveDown()
     {
-        HexString = "ff 04 00 10 " + PanSpeed + " " + TiltSpeed;
+        if (string.IsNullOrEmpty(TiltSpeed))
+            TiltSpeed = "00";
+
+        HexString = "ff 04 00 10 00 " + int.Parse(TiltSpeed).ToString("D2");
         SendHex();
     }
 
     [RelayCommand]
     private void MoveLeft()
     {
-        HexString = "ff 04 00 04 " + PanSpeed + " " + TiltSpeed;
+        if (string.IsNullOrEmpty(PanSpeed))
+            PanSpeed = "00";
+
+        HexString = "ff 04 00 04 " + int.Parse(PanSpeed).ToString("D2") + " 00";
         SendHex();
     }
 
     [RelayCommand]
     private void MoveRight()
     {
-        HexString = "ff 04 00 02 " + PanSpeed + " " + TiltSpeed;
+        if (string.IsNullOrEmpty(PanSpeed))
+            PanSpeed = "00";
+
+        HexString = "ff 04 00 02 " + int.Parse(PanSpeed).ToString("D2") + " 00";
         SendHex();
     }
 
@@ -244,6 +300,60 @@ public partial class MainViewModel : ViewModelBase
         string hex = currentZoom.ToString("X4");
         string result = hex.Insert(2, " ");
         HexString = $"ff 01 00 4f {result}";
+        SendHex();
+    }
+
+    [RelayCommand]
+    private void FocusInIR()
+    {
+        int currentFocus = FocusDefaultIRValue;
+        int step = int.Parse(FocusIRValue);
+        currentFocus += step;
+        FocusDefaultIRValue = currentFocus;
+        string hex = currentFocus.ToString("X4");
+        string result = hex.Insert(2, " ");
+        HexString = $"ff 02 00 5f {result}";
+        SendHex();
+    }
+
+    [RelayCommand]
+    private void FocusOutIR()
+    {
+        int currentFocus = FocusDefaultIRValue;
+        int step = int.Parse(FocusIRValue);
+        currentFocus -= step;
+        if (currentFocus < 0) currentFocus = 0;
+        FocusDefaultIRValue = currentFocus;
+        string hex = currentFocus.ToString("X4");
+        string result = hex.Insert(2, " ");
+        HexString = $"ff 02 00 5f {result}";
+        SendHex();
+    }
+
+    [RelayCommand]
+    private void FocusInDTV()
+    {
+        int currentFocus = FocusDefaultDTVValue;
+        int step = int.Parse(FocusDTVValue);
+        currentFocus += step;
+        FocusDefaultDTVValue = currentFocus;
+        string hex = currentFocus.ToString("X4");
+        string result = hex.Insert(2, " ");
+        HexString = $"ff 01 00 5f {result}";
+        SendHex();
+    }
+
+    [RelayCommand]
+    private void FocusOutDTV()
+    {
+        int currentFocus = FocusDefaultDTVValue;
+        int step = int.Parse(FocusDTVValue);
+        currentFocus -= step;
+        if (currentFocus < 0) currentFocus = 0;
+        FocusDefaultDTVValue = currentFocus;
+        string hex = currentFocus.ToString("X4");
+        string result = hex.Insert(2, " ");
+        HexString = $"ff 01 00 5f {result}";
         SendHex();
     }
 
