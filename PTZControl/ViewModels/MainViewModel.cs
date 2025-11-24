@@ -252,26 +252,41 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void ZoomInIR()
     {
-        //int currentZoom = ZoomDefaultIRValue;
-        //int step = int.Parse(ZoomIRValue);
-        //currentZoom += step;
-        //ZoomDefaultIRValue = currentZoom;
-        //string hex = currentZoom.ToString("X4");
-        //string result = hex.Insert(2, " ");
-        HexString = $"ff 02 00 20 00 00";
+        int currentZoom = ZoomDefaultIRValue;
+        int step = int.Parse(ZoomIRValue);
+        currentZoom += step;
+        ZoomDefaultIRValue = currentZoom;
+        string hex = currentZoom.ToString("X4");
+        string result = hex.Insert(2, " ");
+        HexString = $"ff 02 00 4f {result}";
         SendHex();
     }
 
     [RelayCommand]
     private void ZoomOutIR()
     {
-        //int currentZoom = ZoomDefaultIRValue;
-        //int step = int.Parse(ZoomIRValue);
-        //currentZoom -= step;
-        //if (currentZoom < 0) currentZoom = 0;
-        //ZoomDefaultIRValue = currentZoom;
-        //string hex = currentZoom.ToString("X4");
-        //string result = hex.Insert(2, " ");
+        int currentZoom = ZoomDefaultIRValue;
+        int step = int.Parse(ZoomIRValue);
+        currentZoom -= step;
+        if (currentZoom < 0) currentZoom = 0;
+        ZoomDefaultIRValue = currentZoom;
+        string hex = currentZoom.ToString("X4");
+        string result = hex.Insert(2, " ");
+        HexString = $"ff 02 00 4f {result}";
+        SendHex();
+    }
+
+    [RelayCommand]
+    private void ZoomInMaxIR()
+    {
+        HexString = $"ff 02 00 20 00 00";
+        SendHex();
+    }
+
+    [RelayCommand]
+    private void ZoomOutMaxIR()
+    {
+        ZoomDefaultIRValue = 0;
         HexString = $"ff 02 00 40 00 00";
         SendHex();
     }
@@ -282,6 +297,10 @@ public partial class MainViewModel : ViewModelBase
         int currentZoom = ZoomDefaultDTVValue;
         int step = int.Parse(ZoomDTVValue);
         currentZoom += step;
+
+        if (currentZoom > 960)
+            return;
+
         ZoomDefaultDTVValue = currentZoom;
         string hex = currentZoom.ToString("X4");
         string result = hex.Insert(2, " ");
@@ -304,6 +323,22 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    private void ZoomInMaxDTV()
+    {
+        ZoomDefaultDTVValue = 960;
+        HexString = $"ff 01 00 20 00 00";
+        SendHex();
+    }
+
+    [RelayCommand]
+    private void ZoomOutMaxDTV()
+    {
+        ZoomDefaultDTVValue = 0;
+        HexString = $"ff 01 00 40 00 00";
+        SendHex();
+    }
+
+    [RelayCommand]
     private void FocusInIR()
     {
         int currentFocus = FocusDefaultIRValue;
@@ -319,14 +354,14 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void FocusOutIR()
     {
-        int currentFocus = FocusDefaultIRValue;
-        int step = int.Parse(FocusIRValue);
-        currentFocus -= step;
-        if (currentFocus < 0) currentFocus = 0;
-        FocusDefaultIRValue = currentFocus;
-        string hex = currentFocus.ToString("X4");
-        string result = hex.Insert(2, " ");
-        HexString = $"ff 02 00 5f {result}";
+        //int currentFocus = FocusDefaultIRValue;
+        //int step = int.Parse(FocusIRValue);
+        //currentFocus -= step;
+        //if (currentFocus < 0) currentFocus = 0;
+        //FocusDefaultIRValue = currentFocus;
+        //string hex = currentFocus.ToString("X4");
+        //string result = hex.Insert(2, " ");
+        HexString = $"ff 02 00 2b 00 00";
         SendHex();
     }
 
@@ -337,7 +372,7 @@ public partial class MainViewModel : ViewModelBase
         int step = int.Parse(FocusDTVValue);
         currentFocus += step;
         FocusDefaultDTVValue = currentFocus;
-        string hex = currentFocus.ToString("X4");
+        string hex = step.ToString("X4");
         string result = hex.Insert(2, " ");
         HexString = $"ff 01 00 5f {result}";
         SendHex();
@@ -346,22 +381,17 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void FocusOutDTV()
     {
-        int currentFocus = FocusDefaultDTVValue;
-        int step = int.Parse(FocusDTVValue);
-        currentFocus -= step;
-        if (currentFocus < 0) currentFocus = 0;
-        FocusDefaultDTVValue = currentFocus;
-        string hex = currentFocus.ToString("X4");
-        string result = hex.Insert(2, " ");
-        HexString = $"ff 01 00 5f {result}";
+        FocusDefaultDTVValue = 0;
+        //int currentFocus = FocusDefaultDTVValue;
+        //int step = int.Parse(FocusDTVValue);
+        //currentFocus -= step;
+        //if (currentFocus < 0) currentFocus = 0;
+        //FocusDefaultDTVValue = currentFocus;
+        //string hex = currentFocus.ToString("X4");
+        //string result = hex.Insert(2, " ");
+        HexString = $"ff 01 00 2b 00 00";
         SendHex();
     }
-
-    //[RelayCommand]
-    //private void Connect()
-    //{
-
-    //}
 
     public void OnValueChange(object sender)
     {
@@ -401,6 +431,8 @@ public partial class MainViewModel : ViewModelBase
                 checksum += packet[i];
 
             packet[6] = checksum;
+
+            TcpReply += $"Sent : {DateTime.Now:HH:mm:ss}  {hexInput + " " + checksum.ToString("X2")}\n" + System.Environment.NewLine;
 
             return packet;
         }
