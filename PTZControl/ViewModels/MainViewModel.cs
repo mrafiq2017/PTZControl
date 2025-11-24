@@ -12,6 +12,7 @@ using Avalonia;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using PTZControl.Enums;
 
 namespace PTZControl.ViewModels;
 
@@ -24,6 +25,11 @@ public partial class MainViewModel : ViewModelBase
 
     public ObservableCollection<string> ComPorts { get; } = new();
     public ObservableCollection<int> BaudRates { get; } = new();
+
+    private readonly int IRMaxZoom = 37801;
+    private readonly int IRMinZoom = 24194;
+    private readonly int DTVMaxZoom = 980;
+    private readonly int DTVMinZoom = 28;
 
     [ObservableProperty]
     private string ipAddress = "192.168.1.100";
@@ -56,13 +62,19 @@ public partial class MainViewModel : ViewModelBase
     private string zoomDTVValue = "0";
 
     [ObservableProperty]
+    private string dTVAbsoluteZoomValue = "0";
+
+    [ObservableProperty]
     private string zoomIRValue = "0";
 
     [ObservableProperty]
-    private int zoomDefaultDTVValue = 0;
+    private int zoomDefaultDTVValue = 28;
 
     [ObservableProperty]
-    private int zoomDefaultIRValue = 0;
+    private int zoomDefaultIRValue = 24194;
+
+    [ObservableProperty]
+    private string iRAbsoluteZoomValue = "0";
 
     [ObservableProperty]
     private string tcpReply = "";
@@ -78,6 +90,9 @@ public partial class MainViewModel : ViewModelBase
 
     [ObservableProperty]
     private int focusDefaultIRValue = 0;
+
+    [ObservableProperty]
+    private Commands currentCommand;
 
     public MainViewModel()
     {
@@ -194,13 +209,19 @@ public partial class MainViewModel : ViewModelBase
                 while (recvBuffer.Count >= 7)
                 {
                     byte[] packet = recvBuffer.Take(7).ToArray();   
-                    recvBuffer.RemoveRange(0, 7);                   
+                    recvBuffer.RemoveRange(0, 7);
+
+                    byte b5 = packet[4];
+                    byte b6 = packet[5];
+                    int decB5 = b5;
+                    int decB6 = b6;
+                    int combinedDec = (b5 << 8) | b6;
 
                     string hex = BitConverter.ToString(packet)
                                              .Replace("-", " ")
                                              .ToLower();
 
-                    TcpReply += $"Receive : {DateTime.Now:HH:mm:ss}  {hex}\n"
+                    TcpReply += $"Receive : {DateTime.Now:HH:mm:ss}  {hex} | {CurrentCommand.ToString()} Value : {combinedDec}"
                                 + Environment.NewLine;
                 }
             }
@@ -214,6 +235,7 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void MoveUp()
     {
+        CurrentCommand = Commands.TiltUp;
         if (string.IsNullOrEmpty(TiltSpeed))
             TiltSpeed = "00";
 
@@ -224,6 +246,7 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void MoveDown()
     {
+        CurrentCommand = Commands.TiltDown;
         if (string.IsNullOrEmpty(TiltSpeed))
             TiltSpeed = "00";
 
@@ -234,6 +257,7 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void MoveLeft()
     {
+        CurrentCommand = Commands.PanLeft;
         if (string.IsNullOrEmpty(PanSpeed))
             PanSpeed = "00";
 
@@ -244,6 +268,7 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void MoveRight()
     {
+        CurrentCommand = Commands.PanRight;
         if (string.IsNullOrEmpty(PanSpeed))
             PanSpeed = "00";
 
@@ -254,19 +279,47 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void StopMotor()
     {
+        CurrentCommand = Commands.Stop;
         HexString = "ff 04 00 00 00 00";
+        SendHex();
+    }
+
+    [RelayCommand]
+    private void IRAbsoluteZoom()
+    {
+        CurrentCommand = Commands.IRZoomIn;
+        int currentZoom = ZoomDefaultIRValue;
+        int step = int.Parse(IRAbsoluteZoomValue);
+        currentZoom = step;
+
+        if (currentZoom > IRMaxZoom)
+        {
+            currentZoom = IRMaxZoom;
+            TcpReply = $"Error : {DateTime.Now:HH:mm:ss}  Cannot zoom greater than 37,801."
+                                + Environment.NewLine;
+        }
+
+        ZoomDefaultIRValue = currentZoom;
+        string hex = currentZoom.ToString("X4");
+        string result = hex.Insert(2, " ");
+        HexString = $"ff 02 00 4f {result}";
         SendHex();
     }
 
     [RelayCommand]
     private void ZoomInIR()
     {
+        CurrentCommand = Commands.IRZoomIn;
         int currentZoom = ZoomDefaultIRValue;
         int step = int.Parse(ZoomIRValue);
         currentZoom += step;
 
-        if (currentZoom > 960)
-            return;
+        if (currentZoom > IRMaxZoom)
+        {
+            currentZoom = IRMaxZoom;
+            TcpReply = $"Error : {DateTime.Now:HH:mm:ss}  Cannot zoom greater than 37,801."
+                                + Environment.NewLine;
+        }
 
         ZoomDefaultIRValue = currentZoom;
         string hex = currentZoom.ToString("X4");
@@ -278,10 +331,11 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void ZoomOutIR()
     {
+        CurrentCommand = Commands.IRZoomOut;
         int currentZoom = ZoomDefaultIRValue;
         int step = int.Parse(ZoomIRValue);
         currentZoom -= step;
-        if (currentZoom < 0) currentZoom = 0;
+        if (currentZoom < IRMinZoom) currentZoom = IRMinZoom;
         ZoomDefaultIRValue = currentZoom;
         string hex = currentZoom.ToString("X4");
         string result = hex.Insert(2, " ");
@@ -292,6 +346,8 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void ZoomInMaxIR()
     {
+        CurrentCommand = Commands.IRNarrowFOV;
+        ZoomDefaultIRValue = IRMaxZoom;
         HexString = $"ff 02 00 20 00 00";
         SendHex();
     }
@@ -299,20 +355,48 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void ZoomOutMaxIR()
     {
-        ZoomDefaultIRValue = 0;
+        CurrentCommand = Commands.IRWideFOV;
+        ZoomDefaultIRValue = IRMinZoom;
         HexString = $"ff 02 00 40 00 00";
+        SendHex();
+    }
+
+    [RelayCommand]
+    private void DTVAbsoluteZoom()
+    {
+        CurrentCommand = Commands.DTVManualZoom;
+        int currentZoom = ZoomDefaultDTVValue;
+        int step = int.Parse(DTVAbsoluteZoomValue);
+        currentZoom = step;
+
+        if (currentZoom > DTVMaxZoom)
+        {
+            currentZoom = DTVMaxZoom;
+            TcpReply = $"Info : {DateTime.Now:HH:mm:ss}  Maximum zoom is 980."
+                                + Environment.NewLine;
+        }
+
+        ZoomDefaultDTVValue = currentZoom;
+        string hex = currentZoom.ToString("X4");
+        string result = hex.Insert(2, " ");
+        HexString = $"ff 01 00 4f {result}";
         SendHex();
     }
 
     [RelayCommand]
     private void ZoomInDTV()
     {
+        CurrentCommand = Commands.DTVZoomIn;
         int currentZoom = ZoomDefaultDTVValue;
         int step = int.Parse(ZoomDTVValue);
         currentZoom += step;
 
-        if (currentZoom > 960)
-            return;
+        if (currentZoom > DTVMaxZoom)
+        {
+            currentZoom = DTVMaxZoom;
+            TcpReply = $"Info : {DateTime.Now:HH:mm:ss}  Maximum zoom is 980."
+                                + Environment.NewLine;
+        }
 
         ZoomDefaultDTVValue = currentZoom;
         string hex = currentZoom.ToString("X4");
@@ -324,10 +408,11 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void ZoomOutDTV()
     {
+        CurrentCommand = Commands.DTVZoomOut;
         int currentZoom = ZoomDefaultDTVValue;
         int step = int.Parse(ZoomDTVValue);
         currentZoom -= step;
-        if (currentZoom < 0) currentZoom = 0;
+        if (currentZoom < DTVMinZoom) currentZoom = DTVMinZoom;
         ZoomDefaultDTVValue = currentZoom;
         string hex = currentZoom.ToString("X4");
         string result = hex.Insert(2, " ");
@@ -338,7 +423,8 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void ZoomInMaxDTV()
     {
-        ZoomDefaultDTVValue = 960;
+        CurrentCommand = Commands.DTVWideFOV;
+        ZoomDefaultDTVValue = DTVMaxZoom;
         HexString = $"ff 01 00 20 00 00";
         SendHex();
     }
@@ -346,7 +432,8 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void ZoomOutMaxDTV()
     {
-        ZoomDefaultDTVValue = 0;
+        CurrentCommand = Commands.DTVNarrowFOV;
+        ZoomDefaultDTVValue = DTVMinZoom;
         HexString = $"ff 01 00 40 00 00";
         SendHex();
     }
@@ -354,9 +441,10 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void FocusInIR()
     {
+        CurrentCommand = Commands.IRFocus;
         int currentFocus = FocusDefaultIRValue;
         int step = int.Parse(FocusIRValue);
-        currentFocus += step;
+        currentFocus = step;
         FocusDefaultIRValue = currentFocus;
         string hex = step.ToString("X4");
         string result = hex.Insert(2, " ");
@@ -365,8 +453,9 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void FocusOutIR()
+    private void AutoFocusIR()
     {
+        CurrentCommand = Commands.IRAutoFocus;
         //int currentFocus = FocusDefaultIRValue;
         //int step = int.Parse(FocusIRValue);
         //currentFocus -= step;
@@ -381,9 +470,10 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void FocusInDTV()
     {
+        CurrentCommand = Commands.DTVFocus;
         int currentFocus = FocusDefaultDTVValue;
         int step = int.Parse(FocusDTVValue);
-        currentFocus += step;
+        currentFocus = step;
         FocusDefaultDTVValue = currentFocus;
         string hex = step.ToString("X4");
         string result = hex.Insert(2, " ");
@@ -392,8 +482,9 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void FocusOutDTV()
+    private void AutoFocusDTV()
     {
+        CurrentCommand = Commands.DTVAutoFocus;
         FocusDefaultDTVValue = 0;
         //int currentFocus = FocusDefaultDTVValue;
         //int step = int.Parse(FocusDTVValue);
