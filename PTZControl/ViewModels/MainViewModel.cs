@@ -19,6 +19,8 @@ public partial class MainViewModel : ViewModelBase
 {
     private TcpClient? _tcpClient;
     private NetworkStream? _stream;
+    byte[] buffer = new byte[1024];
+    List<byte> recvBuffer = new List<byte>();
 
     public ObservableCollection<string> ComPorts { get; } = new();
     public ObservableCollection<int> BaudRates { get; } = new();
@@ -187,13 +189,20 @@ public partial class MainViewModel : ViewModelBase
                 if (bytesRead == 0)
                     break;
 
-                // Convert to HEX exactly like the ones you send
-                string hex = BitConverter.ToString(buffer, 0, bytesRead)
-                                         .Replace("-", " ")
-                                         .ToLower(); // remove if you want uppercase
+                recvBuffer.AddRange(buffer.Take(bytesRead));
 
-                // Append to your UI log
-                TcpReply += $"Receive : {DateTime.Now:HH:mm:ss}  {hex}\n" + System.Environment.NewLine;
+                while (recvBuffer.Count >= 7)
+                {
+                    byte[] packet = recvBuffer.Take(7).ToArray();   
+                    recvBuffer.RemoveRange(0, 7);                   
+
+                    string hex = BitConverter.ToString(packet)
+                                             .Replace("-", " ")
+                                             .ToLower();
+
+                    TcpReply += $"Receive : {DateTime.Now:HH:mm:ss}  {hex}\n"
+                                + Environment.NewLine;
+                }
             }
         }
         catch (Exception ex)
@@ -255,6 +264,10 @@ public partial class MainViewModel : ViewModelBase
         int currentZoom = ZoomDefaultIRValue;
         int step = int.Parse(ZoomIRValue);
         currentZoom += step;
+
+        if (currentZoom > 960)
+            return;
+
         ZoomDefaultIRValue = currentZoom;
         string hex = currentZoom.ToString("X4");
         string result = hex.Insert(2, " ");
@@ -345,7 +358,7 @@ public partial class MainViewModel : ViewModelBase
         int step = int.Parse(FocusIRValue);
         currentFocus += step;
         FocusDefaultIRValue = currentFocus;
-        string hex = currentFocus.ToString("X4");
+        string hex = step.ToString("X4");
         string result = hex.Insert(2, " ");
         HexString = $"ff 02 00 5f {result}";
         SendHex();
