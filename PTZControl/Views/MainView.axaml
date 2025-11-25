@@ -419,7 +419,7 @@
                             Height="35"
                             Margin="20,0,0,0"
                             HorizontalContentAlignment="Center"
-                            Command="{Binding ZoomOutMaxDTVCommand}"
+                            Command="{Binding DTVWideFOVCommand}"
                             Content="Wide FOV"
                             CornerRadius="10" />
 
@@ -429,7 +429,7 @@
                             Height="35"
                             Margin="20,0,0,0"
                             HorizontalContentAlignment="Center"
-                            Command="{Binding ZoomInMaxDTVCommand}"
+                            Command="{Binding DTVNarrowFOVCommand}"
                             Content="Narrow FOV"
                             CornerRadius="10" />
 
@@ -541,7 +541,7 @@
                             Height="35"
                             Margin="20,0,0,0"
                             HorizontalContentAlignment="Center"
-                            Command="{Binding ZoomInMaxIRCommand}"
+                            Command="{Binding IRNarrowFOVCommand}"
                             Content="Narrow FOV"
                             CornerRadius="10" />
 
@@ -551,7 +551,7 @@
                             Height="35"
                             Margin="20,0,0,0"
                             HorizontalContentAlignment="Center"
-                            Command="{Binding ZoomOutMaxIRCommand}"
+                            Command="{Binding IRWideFOVCommand}"
                             Content="Wide FOV"
                             CornerRadius="10" />
 
@@ -625,7 +625,7 @@
                             Height="35"
                             Margin="-60,0,0,0"
                             HorizontalContentAlignment="Center"
-                            Command="{Binding FocusInDTVCommand}"
+                            Command="{Binding FocusDTVCommand}"
                             Content="Focus"
                             CornerRadius="10" />
 
@@ -670,7 +670,7 @@
                             Height="35"
                             Margin="-50,0,0,0"
                             HorizontalContentAlignment="Center"
-                            Command="{Binding FocusInIRCommand}"
+                            Command="{Binding FocusIRCommand}"
                             Content="Focus"
                             CornerRadius="10" />
 

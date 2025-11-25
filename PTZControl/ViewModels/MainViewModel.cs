@@ -232,6 +232,8 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
+    #region Pan/Tilt
+
     [RelayCommand]
     private void MoveUp()
     {
@@ -283,6 +285,10 @@ public partial class MainViewModel : ViewModelBase
         HexString = "ff 04 00 00 00 00";
         SendHex();
     }
+
+    #endregion
+
+    #region IR
 
     [RelayCommand]
     private void IRAbsoluteZoom()
@@ -344,7 +350,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void ZoomInMaxIR()
+    private void IRNarrowFOV()
     {
         CurrentCommand = Commands.IRNarrowFOV;
         ZoomDefaultIRValue = IRMaxZoom;
@@ -353,13 +359,39 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void ZoomOutMaxIR()
+    private void IRWideFOV()
     {
         CurrentCommand = Commands.IRWideFOV;
         ZoomDefaultIRValue = IRMinZoom;
         HexString = $"ff 02 00 40 00 00";
         SendHex();
     }
+
+    [RelayCommand]
+    private void FocusIR()
+    {
+        CurrentCommand = Commands.IRFocus;
+        int currentFocus = FocusDefaultIRValue;
+        int step = int.Parse(FocusIRValue);
+        currentFocus = step;
+        FocusDefaultIRValue = currentFocus;
+        string hex = step.ToString("X4");
+        string result = hex.Insert(2, " ");
+        HexString = $"ff 02 00 5f {result}";
+        SendHex();
+    }
+
+    [RelayCommand]
+    private void AutoFocusIR()
+    {
+        CurrentCommand = Commands.IRAutoFocus;
+        HexString = $"ff 02 00 2b 00 00";
+        SendHex();
+    }
+
+    #endregion
+
+    #region
 
     [RelayCommand]
     private void DTVAbsoluteZoom()
@@ -421,7 +453,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void ZoomInMaxDTV()
+    private void DTVNarrowFOV()
     {
         CurrentCommand = Commands.DTVWideFOV;
         ZoomDefaultDTVValue = DTVMaxZoom;
@@ -430,7 +462,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void ZoomOutMaxDTV()
+    private void DTVWideFOV()
     {
         CurrentCommand = Commands.DTVNarrowFOV;
         ZoomDefaultDTVValue = DTVMinZoom;
@@ -439,36 +471,7 @@ public partial class MainViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void FocusInIR()
-    {
-        CurrentCommand = Commands.IRFocus;
-        int currentFocus = FocusDefaultIRValue;
-        int step = int.Parse(FocusIRValue);
-        currentFocus = step;
-        FocusDefaultIRValue = currentFocus;
-        string hex = step.ToString("X4");
-        string result = hex.Insert(2, " ");
-        HexString = $"ff 02 00 5f {result}";
-        SendHex();
-    }
-
-    [RelayCommand]
-    private void AutoFocusIR()
-    {
-        CurrentCommand = Commands.IRAutoFocus;
-        //int currentFocus = FocusDefaultIRValue;
-        //int step = int.Parse(FocusIRValue);
-        //currentFocus -= step;
-        //if (currentFocus < 0) currentFocus = 0;
-        //FocusDefaultIRValue = currentFocus;
-        //string hex = currentFocus.ToString("X4");
-        //string result = hex.Insert(2, " ");
-        HexString = $"ff 02 00 2b 00 00";
-        SendHex();
-    }
-
-    [RelayCommand]
-    private void FocusInDTV()
+    private void FocusDTV()
     {
         CurrentCommand = Commands.DTVFocus;
         int currentFocus = FocusDefaultDTVValue;
@@ -485,17 +488,11 @@ public partial class MainViewModel : ViewModelBase
     private void AutoFocusDTV()
     {
         CurrentCommand = Commands.DTVAutoFocus;
-        FocusDefaultDTVValue = 0;
-        //int currentFocus = FocusDefaultDTVValue;
-        //int step = int.Parse(FocusDTVValue);
-        //currentFocus -= step;
-        //if (currentFocus < 0) currentFocus = 0;
-        //FocusDefaultDTVValue = currentFocus;
-        //string hex = currentFocus.ToString("X4");
-        //string result = hex.Insert(2, " ");
         HexString = $"ff 01 00 2b 00 00";
         SendHex();
     }
+
+    #endregion
 
     public void OnValueChange(object sender)
     {
