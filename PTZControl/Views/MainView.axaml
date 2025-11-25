@@ -176,38 +176,31 @@
 
                         <!--  Up Arrow  -->
                         <Button
+                            Name="moveUp"
                             Grid.Row="0"
                             Grid.Column="1"
                             Width="100"
-                            Height="40"
+                            Height="30"
                             Margin="0,0,0,10"
                             HorizontalContentAlignment="Center"
                             Command="{Binding MoveUpCommand}"
                             CommandParameter="Up"
-                            Content="Up"
+                            Content="🢁"
                             CornerRadius="10"
-                            FontSize="16">
-                            <Button.Styles>
-                                <Style Selector="Button:pointerover">
-                                    <Setter Property="Background" Value="#0078D4" />
-                                </Style>
-                                <Style Selector="Button:pressed">
-                                    <Setter Property="Background" Value="#005A9E" />
-                                </Style>
-                            </Button.Styles>
-                        </Button>
+                            FontSize="16" />
 
                         <!--  Left Arrow  -->
                         <Button
+                            Name="moveLeft"
                             Grid.Row="1"
                             Grid.Column="0"
                             Width="100"
-                            Height="40"
+                            Height="30"
                             Margin="200,0,10,0"
                             HorizontalContentAlignment="Center"
                             Command="{Binding MoveLeftCommand}"
                             CommandParameter="Left"
-                            Content="Left"
+                            Content="🢀"
                             CornerRadius="10"
                             FontSize="16">
                             <Button.Styles>
@@ -227,10 +220,11 @@
                             Width="100"
                             Height="40"
                             Margin="0,0,0,0"
+                            Padding="0,8,0,0"
                             HorizontalContentAlignment="Center"
                             Command="{Binding StopMotorCommand}"
                             Content="STOP"
-                            CornerRadius="50"
+                            CornerRadius="10"
                             FontSize="16">
                             <Button.Styles>
                                 <Style Selector="Button:pressed">
@@ -241,15 +235,16 @@
 
                         <!--  Right Arrow  -->
                         <Button
+                            Name="moveRight"
                             Grid.Row="1"
                             Grid.Column="2"
                             Width="100"
-                            Height="40"
+                            Height="30"
                             Margin="-100,0,0,0"
                             HorizontalContentAlignment="Center"
                             Command="{Binding MoveRightCommand}"
                             CommandParameter="Right"
-                            Content="Right"
+                            Content="🢂"
                             CornerRadius="10"
                             FontSize="16"
                             Tag="Right">
@@ -265,15 +260,16 @@
 
                         <!--  Down Arrow  -->
                         <Button
+                            Name="moveDown"
                             Grid.Row="2"
                             Grid.Column="1"
                             Width="100"
-                            Height="40"
+                            Height="30"
                             Margin="0,10,0,0"
                             HorizontalContentAlignment="Center"
                             Command="{Binding MoveDownCommand}"
                             CommandParameter="Down"
-                            Content="Down"
+                            Content="🢃"
                             CornerRadius="10"
                             FontSize="16">
                             <Button.Styles>
@@ -300,6 +296,24 @@
                     <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="*,*">
 
                         <TextBlock
+                            Grid.Column="0"
+                            VerticalAlignment="Center"
+                            FontSize="14"
+                            FontWeight="SemiBold"
+                            Text="Tilt Speed" />
+                        <TextBox
+                            Grid.Column="0"
+                            Width="170"
+                            Height="38"
+                            Margin="100,0,0,0"
+                            Padding="12,0"
+                            VerticalContentAlignment="Center"
+                            BorderThickness="1"
+                            CornerRadius="10"
+                            FontSize="14"
+                            Text="{Binding TiltSpeed}" />
+
+                        <TextBlock
                             Grid.Column="1"
                             Margin="50,0,0,0"
                             VerticalAlignment="Center"
@@ -317,24 +331,6 @@
                             CornerRadius="10"
                             FontSize="14"
                             Text="{Binding PanSpeed}" />
-
-                        <TextBlock
-                            Grid.Column="0"
-                            VerticalAlignment="Center"
-                            FontSize="14"
-                            FontWeight="SemiBold"
-                            Text="Tilt Speed" />
-                        <TextBox
-                            Grid.Column="0"
-                            Width="170"
-                            Height="38"
-                            Margin="100,0,0,0"
-                            Padding="12,0"
-                            VerticalContentAlignment="Center"
-                            BorderThickness="1"
-                            CornerRadius="10"
-                            FontSize="14"
-                            Text="{Binding TiltSpeed}" />
                     </Grid>
                 </Border>
 
@@ -364,10 +360,10 @@
                             Grid.Column="0"
                             Margin="-5,-30,0,0"
                             VerticalAlignment="Center"
-                            FontSize="8"
+                            FontSize="10"
                             FontWeight="SemiBold"
                             Foreground="Red"
-                            Text="(28 ~ 980)" />
+                            Text="*zoom (28 ~ 980)" />
 
                         <TextBlock
                             Grid.Row="0"
@@ -415,22 +411,22 @@
 
                         <Button
                             Grid.Row="0"
-                            Grid.Column="5"
-                            Height="35"
-                            Margin="20,0,0,0"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding DTVWideFOVCommand}"
-                            Content="Wide FOV"
-                            CornerRadius="10" />
-
-                        <Button
-                            Grid.Row="0"
                             Grid.Column="4"
                             Height="35"
                             Margin="20,0,0,0"
                             HorizontalContentAlignment="Center"
                             Command="{Binding DTVNarrowFOVCommand}"
                             Content="Narrow FOV"
+                            CornerRadius="10" />
+
+                        <Button
+                            Grid.Row="0"
+                            Grid.Column="5"
+                            Height="35"
+                            Margin="20,0,0,0"
+                            HorizontalContentAlignment="Center"
+                            Command="{Binding DTVWideFOVCommand}"
+                            Content="Wide FOV"
                             CornerRadius="10" />
 
                         <TextBox
@@ -457,6 +453,43 @@
                             Command="{Binding DTVAbsoluteZoomCommand}"
                             Content="Zoom"
                             CornerRadius="10" />
+
+                        <TextBox
+                            Grid.Row="1"
+                            Grid.Column="3"
+                            Width="60"
+                            Height="38"
+                            Margin="50,20,0,0"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Background="#FAFAFA"
+                            BorderBrush="#CCCCCC"
+                            BorderThickness="1"
+                            CornerRadius="10"
+                            FontSize="14"
+                            Text="{Binding FocusDTVValue}" />
+
+                        <Button
+                            Grid.Row="1"
+                            Grid.Column="4"
+                            Width="100"
+                            Height="35"
+                            Margin="20,20,0,0"
+                            HorizontalContentAlignment="Center"
+                            Command="{Binding FocusDTVCommand}"
+                            Content="Focus"
+                            CornerRadius="10" />
+
+                        <Button
+                            Grid.Row="1"
+                            Grid.Column="5"
+                            Height="35"
+                            Margin="20,20,0,0"
+                            HorizontalContentAlignment="Center"
+                            Command="{Binding AutoFocusDTVCommand}"
+                            Content="Auto Focus"
+                            CornerRadius="10" />
+
                     </Grid>
                 </Border>
 
@@ -471,7 +504,7 @@
                     BorderThickness="1"
                     CornerRadius="20">
 
-                    <Grid ColumnDefinitions="*,*,*,*,*,*" RowDefinitions="*,*">
+                    <Grid ColumnDefinitions="*,*,*,*,*,*" RowDefinitions="*,*,*">
 
                         <TextBlock
                             Grid.Row="0"
@@ -486,10 +519,10 @@
                             Grid.Column="0"
                             Margin="-5,-30,0,0"
                             VerticalAlignment="Center"
-                            FontSize="8"
+                            FontSize="10"
                             FontWeight="SemiBold"
                             Foreground="Red"
-                            Text="(24194 ~ 37,801)" />
+                            Text="*zoom (24194 ~ 37,801)" />
 
                         <TextBlock
                             Grid.Row="0"
@@ -579,82 +612,13 @@
                             Command="{Binding IRAbsoluteZoomCommand}"
                             Content="Zoom"
                             CornerRadius="10" />
-                    </Grid>
-                </Border>
-
-                <Border
-                    Grid.Row="4"
-                    Width="750"
-                    Margin="20,10,0,0"
-                    Padding="20"
-                    HorizontalAlignment="Left"
-                    Background="White"
-                    BorderBrush="#CCCCCC"
-                    BorderThickness="1"
-                    CornerRadius="20">
-
-                    <Grid ColumnDefinitions="*,*,*,*,*,*,*,*" RowDefinitions="*">
-
-                        <TextBlock
-                            Grid.Row="0"
-                            Grid.Column="0"
-                            Margin="0,0,0,0"
-                            VerticalAlignment="Center"
-                            FontSize="14"
-                            FontWeight="SemiBold"
-                            Text="DTV" />
 
                         <TextBox
-                            Grid.Row="0"
-                            Grid.Column="1"
-                            Width="60"
-                            Height="38"
-                            Margin="-110,0,0,0"
-                            HorizontalContentAlignment="Center"
-                            VerticalContentAlignment="Center"
-                            Background="#FAFAFA"
-                            BorderBrush="#CCCCCC"
-                            BorderThickness="1"
-                            CornerRadius="10"
-                            FontSize="14"
-                            Text="{Binding FocusDTVValue}" />
-
-                        <Button
-                            Grid.Row="0"
-                            Grid.Column="2"
-                            Height="35"
-                            Margin="-60,0,0,0"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding FocusDTVCommand}"
-                            Content="Focus"
-                            CornerRadius="10" />
-
-                        <Button
-                            Grid.Row="0"
+                            Grid.Row="1"
                             Grid.Column="3"
-                            Width="100"
-                            Height="35"
-                            Margin="-60,0,0,0"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding AutoFocusDTVCommand}"
-                            Content="Auto Focus"
-                            CornerRadius="10" />
-
-                        <TextBlock
-                            Grid.Row="0"
-                            Grid.Column="4"
-                            Margin="15,0,0,0"
-                            VerticalAlignment="Center"
-                            FontSize="14"
-                            FontWeight="SemiBold"
-                            Text="IR" />
-
-                        <TextBox
-                            Grid.Row="0"
-                            Grid.Column="5"
                             Width="60"
                             Height="38"
-                            Margin="-110,0,0,0"
+                            Margin="50,20,0,0"
                             HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center"
                             Background="#FAFAFA"
@@ -665,21 +629,21 @@
                             Text="{Binding FocusIRValue}" />
 
                         <Button
-                            Grid.Row="0"
-                            Grid.Column="6"
+                            Grid.Row="1"
+                            Grid.Column="4"
+                            Width="100"
                             Height="35"
-                            Margin="-50,0,0,0"
+                            Margin="20,20,0,0"
                             HorizontalContentAlignment="Center"
                             Command="{Binding FocusIRCommand}"
                             Content="Focus"
                             CornerRadius="10" />
 
                         <Button
-                            Grid.Row="0"
-                            Grid.Column="7"
-                            Width="100"
+                            Grid.Row="1"
+                            Grid.Column="5"
                             Height="35"
-                            Margin="-50,0,0,0"
+                            Margin="20,20,0,0"
                             HorizontalContentAlignment="Center"
                             Command="{Binding AutoFocusIRCommand}"
                             Content="Auto Focus"
@@ -691,7 +655,7 @@
                 <Border
                     Grid.Row="5"
                     Width="750"
-                    Height="150"
+                    Height="200"
                     Margin="20,10,0,0"
                     Padding="20"
                     HorizontalAlignment="Left"
@@ -713,7 +677,7 @@
                             VerticalScrollBarVisibility="Auto">
                             <TextBox
                                 x:Name="tcpReplyTextBox"
-                                Height="120"
+                                Height="180"
                                 Padding="8"
                                 AcceptsReturn="True"
                                 Background="#F4F4F4"

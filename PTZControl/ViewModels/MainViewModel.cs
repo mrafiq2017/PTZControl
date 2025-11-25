@@ -18,6 +18,8 @@ namespace PTZControl.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {
+    #region Props
+
     private TcpClient? _tcpClient;
     private NetworkStream? _stream;
     byte[] buffer = new byte[1024];
@@ -94,59 +96,17 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     private Commands currentCommand;
 
+    #endregion
+
     public MainViewModel()
     {
-        LoadComPorts();
-        LoadBaudRates();
+        
     }
 
-    public void LoadComPorts()
-    {
-        try
-        {
-            ComPorts.Clear();
-            string[] ports = SerialPort.GetPortNames();
-
-            if (ports.Length > 0)
-            {
-                foreach (var port in ports)
-                    ComPorts.Add(port);
-
-                Port = "";
-            }
-            else
-            {
-                ComPorts.Add("No COM ports found");
-                Port = ComPorts.First();
-            }
-        }
-        catch (Exception ex)
-        {
-           
-        }
-    }
-
-    private void LoadBaudRates()
-    {
-        try
-        {
-            BaudRates.Clear();
-            var listOfBaudRates = new List<int> { 110, 300, 600, 1200, 2400, 4800, 9600, 14400,
-                19200, 38400, 57600, 115200, 128000, 256000 };
-
-            foreach (var baudrate in listOfBaudRates)
-                BaudRates.Add(baudrate);
-
-            SelectedBaudRate = BaudRates[6];
-        }
-        catch (Exception ex)
-        {
-            
-        }
-    }
+    #region TCP 
 
     [RelayCommand]
-    private async void SendHex()
+    private async Task SendHex()
     {
         try
         {
@@ -208,7 +168,7 @@ public partial class MainViewModel : ViewModelBase
 
                 while (recvBuffer.Count >= 7)
                 {
-                    byte[] packet = recvBuffer.Take(7).ToArray();   
+                    byte[] packet = recvBuffer.Take(7).ToArray();
                     recvBuffer.RemoveRange(0, 7);
 
                     byte b5 = packet[4];
@@ -232,58 +192,60 @@ public partial class MainViewModel : ViewModelBase
         }
     }
 
+    #endregion
+
     #region Pan/Tilt
 
     [RelayCommand]
-    private void MoveUp()
+    private async Task MoveUp()
     {
         CurrentCommand = Commands.TiltUp;
         if (string.IsNullOrEmpty(TiltSpeed))
             TiltSpeed = "00";
 
         HexString = "ff 04 00 08 00 " + int.Parse(TiltSpeed).ToString("D2");
-        SendHex();
+        await SendHex();
     }
 
     [RelayCommand]
-    private void MoveDown()
+    private async Task MoveDown()
     {
         CurrentCommand = Commands.TiltDown;
         if (string.IsNullOrEmpty(TiltSpeed))
             TiltSpeed = "00";
 
         HexString = "ff 04 00 10 00 " + int.Parse(TiltSpeed).ToString("D2");
-        SendHex();
+        await SendHex();
     }
 
     [RelayCommand]
-    private void MoveLeft()
+    private async Task MoveLeft()
     {
         CurrentCommand = Commands.PanLeft;
         if (string.IsNullOrEmpty(PanSpeed))
             PanSpeed = "00";
 
         HexString = "ff 04 00 04 " + int.Parse(PanSpeed).ToString("D2") + " 00";
-        SendHex();
+        await SendHex();
     }
 
     [RelayCommand]
-    private void MoveRight()
+    private async Task MoveRight()
     {
         CurrentCommand = Commands.PanRight;
         if (string.IsNullOrEmpty(PanSpeed))
             PanSpeed = "00";
 
         HexString = "ff 04 00 02 " + int.Parse(PanSpeed).ToString("D2") + " 00";
-        SendHex();
+        await SendHex();
     }
 
     [RelayCommand]
-    private void StopMotor()
+    private async Task StopMotor()
     {
         CurrentCommand = Commands.Stop;
         HexString = "ff 04 00 00 00 00";
-        SendHex();
+        await SendHex();
     }
 
     #endregion
@@ -291,9 +253,9 @@ public partial class MainViewModel : ViewModelBase
     #region IR
 
     [RelayCommand]
-    private void IRAbsoluteZoom()
+    private async Task IRAbsoluteZoom()
     {
-        CurrentCommand = Commands.IRZoomIn;
+        CurrentCommand = Commands.IRManualZoom;
         int currentZoom = ZoomDefaultIRValue;
         int step = int.Parse(IRAbsoluteZoomValue);
         currentZoom = step;
@@ -309,11 +271,11 @@ public partial class MainViewModel : ViewModelBase
         string hex = currentZoom.ToString("X4");
         string result = hex.Insert(2, " ");
         HexString = $"ff 02 00 4f {result}";
-        SendHex();
+        await SendHex();
     }
 
     [RelayCommand]
-    private void ZoomInIR()
+    private async Task ZoomInIR()
     {
         CurrentCommand = Commands.IRZoomIn;
         int currentZoom = ZoomDefaultIRValue;
@@ -331,44 +293,47 @@ public partial class MainViewModel : ViewModelBase
         string hex = currentZoom.ToString("X4");
         string result = hex.Insert(2, " ");
         HexString = $"ff 02 00 4f {result}";
-        SendHex();
+        await SendHex();
     }
 
     [RelayCommand]
-    private void ZoomOutIR()
+    private async Task ZoomOutIR()
     {
         CurrentCommand = Commands.IRZoomOut;
         int currentZoom = ZoomDefaultIRValue;
         int step = int.Parse(ZoomIRValue);
         currentZoom -= step;
-        if (currentZoom < IRMinZoom) currentZoom = IRMinZoom;
+        if (currentZoom < IRMinZoom)
+        {
+            currentZoom = IRMinZoom;
+        }
         ZoomDefaultIRValue = currentZoom;
         string hex = currentZoom.ToString("X4");
         string result = hex.Insert(2, " ");
         HexString = $"ff 02 00 4f {result}";
-        SendHex();
+        await SendHex();
     }
 
     [RelayCommand]
-    private void IRNarrowFOV()
+    private async Task IRNarrowFOV()
     {
         CurrentCommand = Commands.IRNarrowFOV;
         ZoomDefaultIRValue = IRMaxZoom;
         HexString = $"ff 02 00 20 00 00";
-        SendHex();
+        await SendHex();
     }
 
     [RelayCommand]
-    private void IRWideFOV()
+    private async Task IRWideFOV()
     {
         CurrentCommand = Commands.IRWideFOV;
         ZoomDefaultIRValue = IRMinZoom;
         HexString = $"ff 02 00 40 00 00";
-        SendHex();
+        await SendHex();
     }
 
     [RelayCommand]
-    private void FocusIR()
+    private async Task FocusIR()
     {
         CurrentCommand = Commands.IRFocus;
         int currentFocus = FocusDefaultIRValue;
@@ -378,23 +343,23 @@ public partial class MainViewModel : ViewModelBase
         string hex = step.ToString("X4");
         string result = hex.Insert(2, " ");
         HexString = $"ff 02 00 5f {result}";
-        SendHex();
+        await SendHex();
     }
 
     [RelayCommand]
-    private void AutoFocusIR()
+    private async Task AutoFocusIR()
     {
         CurrentCommand = Commands.IRAutoFocus;
         HexString = $"ff 02 00 2b 00 00";
-        SendHex();
+        await SendHex();
     }
 
     #endregion
 
-    #region
+    #region DTV
 
     [RelayCommand]
-    private void DTVAbsoluteZoom()
+    private async Task DTVAbsoluteZoom()
     {
         CurrentCommand = Commands.DTVManualZoom;
         int currentZoom = ZoomDefaultDTVValue;
@@ -412,11 +377,11 @@ public partial class MainViewModel : ViewModelBase
         string hex = currentZoom.ToString("X4");
         string result = hex.Insert(2, " ");
         HexString = $"ff 01 00 4f {result}";
-        SendHex();
+        await SendHex();
     }
 
     [RelayCommand]
-    private void ZoomInDTV()
+    private async Task ZoomInDTV()
     {
         CurrentCommand = Commands.DTVZoomIn;
         int currentZoom = ZoomDefaultDTVValue;
@@ -434,44 +399,47 @@ public partial class MainViewModel : ViewModelBase
         string hex = currentZoom.ToString("X4");
         string result = hex.Insert(2, " ");
         HexString = $"ff 01 00 4f {result}";
-        SendHex();
+        await SendHex();
     }
 
     [RelayCommand]
-    private void ZoomOutDTV()
+    private async Task ZoomOutDTV()
     {
         CurrentCommand = Commands.DTVZoomOut;
         int currentZoom = ZoomDefaultDTVValue;
         int step = int.Parse(ZoomDTVValue);
         currentZoom -= step;
-        if (currentZoom < DTVMinZoom) currentZoom = DTVMinZoom;
+        if (currentZoom < DTVMinZoom)
+        {
+            currentZoom = DTVMinZoom;
+        }
         ZoomDefaultDTVValue = currentZoom;
         string hex = currentZoom.ToString("X4");
         string result = hex.Insert(2, " ");
         HexString = $"ff 01 00 4f {result}";
-        SendHex();
+        await SendHex();
     }
 
     [RelayCommand]
-    private void DTVNarrowFOV()
+    private async Task DTVNarrowFOV()
     {
         CurrentCommand = Commands.DTVWideFOV;
         ZoomDefaultDTVValue = DTVMaxZoom;
         HexString = $"ff 01 00 20 00 00";
-        SendHex();
+        await SendHex();
     }
 
     [RelayCommand]
-    private void DTVWideFOV()
+    private async Task DTVWideFOV()
     {
         CurrentCommand = Commands.DTVNarrowFOV;
         ZoomDefaultDTVValue = DTVMinZoom;
         HexString = $"ff 01 00 40 00 00";
-        SendHex();
+        await SendHex();
     }
 
     [RelayCommand]
-    private void FocusDTV()
+    private async Task FocusDTV()
     {
         CurrentCommand = Commands.DTVFocus;
         int currentFocus = FocusDefaultDTVValue;
@@ -481,23 +449,20 @@ public partial class MainViewModel : ViewModelBase
         string hex = step.ToString("X4");
         string result = hex.Insert(2, " ");
         HexString = $"ff 01 00 5f {result}";
-        SendHex();
+        await SendHex();
     }
 
     [RelayCommand]
-    private void AutoFocusDTV()
+    private async Task AutoFocusDTV()
     {
         CurrentCommand = Commands.DTVAutoFocus;
         HexString = $"ff 01 00 2b 00 00";
-        SendHex();
+        await SendHex();
     }
 
     #endregion
 
-    public void OnValueChange(object sender)
-    {
-        
-    }
+    #region Common
 
     private byte[]? HexStringTo7Bytes(string hexInput)
     {
@@ -542,4 +507,6 @@ public partial class MainViewModel : ViewModelBase
             return null;
         }
     }
+
+    #endregion
 }
