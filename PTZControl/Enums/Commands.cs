@@ -28,5 +28,10 @@ namespace PTZControl.Enums
         IRAutoFocus,
         DTVFocus,
         DTVAutoFocus,
+        DTVZoomPos,
+        IRZoomPos,
+        EnableFilters,
+        DisableFilters,
+        DefaultFilters
     }
 }

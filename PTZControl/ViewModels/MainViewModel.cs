@@ -127,7 +127,11 @@ public partial class MainViewModel : ViewModelBase
                 _tcpClient = new TcpClient();
                 await _tcpClient.ConnectAsync(IpAddress, port);
                 _stream = _tcpClient.GetStream();
-                StartReceiving();
+                if(CurrentCommand.ToString() != Commands.TiltUp.ToString() || CurrentCommand.ToString() != Commands.TiltDown.ToString()
+                    || CurrentCommand.ToString() != Commands.PanLeft.ToString() || CurrentCommand.ToString() != Commands.PanRight.ToString())
+                {
+                    StartReceiving();
+                }
             }
 
             if (!string.IsNullOrEmpty(HexString))
@@ -163,37 +167,56 @@ public partial class MainViewModel : ViewModelBase
 
         try
         {
-            while (_tcpClient?.Connected == true)
+            if (CurrentCommand.ToString() != Commands.TiltUp.ToString() || CurrentCommand.ToString() != Commands.TiltDown.ToString()
+                    || CurrentCommand.ToString() != Commands.PanLeft.ToString() || CurrentCommand.ToString() != Commands.PanRight.ToString())
             {
-                int bytesRead = await _stream.ReadAsync(buffer, 0, buffer.Length);
-                if (bytesRead == 0)
-                    break;
-
-                recvBuffer.AddRange(buffer.Take(bytesRead));
-
-                while (recvBuffer.Count >= 7)
+                while (_tcpClient?.Connected == true)
                 {
-                    byte[] packet = recvBuffer.Take(7).ToArray();
-                    recvBuffer.RemoveRange(0, 7);
+                    int bytesRead = await _stream.ReadAsync(buffer, 0, buffer.Length);
+                    if (bytesRead == 0)
+                        break;
 
-                    byte b5 = packet[4];
-                    byte b6 = packet[5];
-                    int decB5 = b5;
-                    int decB6 = b6;
-                    int combinedDec = (b5 << 8) | b6;
+                    recvBuffer.AddRange(buffer.Take(bytesRead));
+                    Array.Clear(buffer, 0, buffer.Length);
 
-                    string hex = BitConverter.ToString(packet)
-                                             .Replace("-", " ")
-                                             .ToLower();
+                    while (recvBuffer.Count >= 7)
+                    {
+                        byte[] packet = recvBuffer.Take(7).ToArray();
+                        recvBuffer.RemoveRange(0, 7);
 
-                    TcpReply += $"Receive : {DateTime.Now:HH:mm:ss}  {hex} | {CurrentCommand.ToString()} Value : {combinedDec}"
-                                + Environment.NewLine;
+                        byte b5 = packet[4];
+                        byte b6 = packet[5];
+                        int decB5 = b5;
+                        int decB6 = b6;
+                        int combinedDec = (b5 << 8) | b6;
+
+                        string hex = BitConverter.ToString(packet)
+                                                 .Replace("-", " ")
+                                                 .ToLower();
+
+                        //if (CurrentCommand.ToString() == Commands.DTVZoomPos.ToString())
+                        //{
+                        //    ZoomDefaultDTVValue = combinedDec;
+                        //}
+
+                        //if (CurrentCommand.ToString() == Commands.IRZoomPos.ToString())
+                        //{
+                        //    ZoomDefaultIRValue = combinedDec;
+                        //}
+
+                        TcpReply += $"Receive : {DateTime.Now:HH:mm:ss}  {hex} | {CurrentCommand.ToString()} Value : {combinedDec}"
+                                    + Environment.NewLine;
+                    }
                 }
-            }
+            }            
         }
         catch (Exception ex)
         {
             TcpReply += $"Receive error: {ex.Message}\n" + System.Environment.NewLine;
+        }
+        finally
+        {
+            recvBuffer.Clear();
         }
     }
 
@@ -304,6 +327,7 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private async Task ZoomInIR()
     {
+        //await CheckIRZoomPosition();
         CurrentCommand = Commands.IRZoomIn;
         int currentZoom = ZoomDefaultIRValue;
         int step = int.Parse(ZoomIRValue);
@@ -410,6 +434,7 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private async Task ZoomInDTV()
     {
+        //await CheckDTVZoomPosition();
         CurrentCommand = Commands.DTVZoomIn;
         int currentZoom = ZoomDefaultDTVValue;
         int step = int.Parse(ZoomDTVValue);
@@ -490,6 +515,74 @@ public partial class MainViewModel : ViewModelBase
     #endregion
 
     #region Common
+
+    private async Task CheckDTVZoomPosition()
+    {
+        CurrentCommand = Commands.IRZoomPos;
+        HexString = $"ff 02 00 55 00 00";
+        await SendHex();
+    }
+
+    private async Task CheckIRZoomPosition()
+    {
+        CurrentCommand = Commands.IRZoomPos;
+        HexString = $"ff 02 00 55 00 00";
+        await SendHex();
+    }
+
+    [RelayCommand]
+    private async Task EnableFilter()
+    {
+        CurrentCommand = Commands.EnableFilters;
+
+        HexString = $"ff 02 E0 37 00 0A";
+        await SendHex();
+
+        HexString = $"ff 02 E0 38 00 0A";
+        await SendHex();
+
+        HexString = $"ff 02 E0 39 00 32";
+        await SendHex();
+
+        HexString = $"ff 02 E0 3A 00 0A";
+        await SendHex();
+    }
+
+    [RelayCommand]
+    private async Task DisableFilter()
+    {
+        CurrentCommand = Commands.DisableFilters;
+
+        HexString = $"ff 02 E0 37 00 00";
+        await SendHex();
+
+        HexString = $"ff 02 E0 38 00 00";
+        await SendHex();
+
+        HexString = $"ff 02 E0 39 00 00";
+        await SendHex();
+
+        HexString = $"ff 02 E0 3A 00 00";
+        await SendHex();
+    }
+
+    [RelayCommand]
+    private async Task DefaultFilter()
+    {
+        CurrentCommand = Commands.DisableFilters;
+
+        HexString = $"ff 02 E0 37 00 00";
+        await SendHex();
+
+        HexString = $"ff 02 E0 38 00 00";
+        await SendHex();
+
+        HexString = $"ff 02 E0 39 00 05";
+        await SendHex();
+
+        HexString = $"ff 02 E0 3A 00 03";
+        await SendHex();
+    }
 
     private byte[]? HexStringTo7Bytes(string hexInput)
     {

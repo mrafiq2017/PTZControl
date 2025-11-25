@@ -296,12 +296,14 @@
                     <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="*,*">
 
                         <TextBlock
+                            Grid.Row="1"
                             Grid.Column="0"
                             VerticalAlignment="Center"
                             FontSize="14"
                             FontWeight="SemiBold"
                             Text="Tilt Speed" />
                         <TextBox
+                            Grid.Row="1"
                             Grid.Column="0"
                             Width="170"
                             Height="38"
@@ -314,6 +316,7 @@
                             Text="{Binding TiltSpeed}" />
 
                         <TextBlock
+                            Grid.Row="1"
                             Grid.Column="1"
                             Margin="50,0,0,0"
                             VerticalAlignment="Center"
@@ -321,6 +324,7 @@
                             FontWeight="SemiBold"
                             Text="Pan Speed" />
                         <TextBox
+                            Grid.Row="1"
                             Grid.Column="1"
                             Width="170"
                             Height="38"
@@ -331,6 +335,36 @@
                             CornerRadius="10"
                             FontSize="14"
                             Text="{Binding PanSpeed}" />
+
+                        <Button
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Height="35"
+                            Margin="0,-10,0,20"
+                            HorizontalContentAlignment="Center"
+                            Command="{Binding EnableFilterCommand}"
+                            Content="Enable Filters"
+                            CornerRadius="10" />
+
+                        <Button
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Height="35"
+                            Margin="-150,-10,0,20"
+                            HorizontalContentAlignment="Center"
+                            Command="{Binding DisableFilterCommand}"
+                            Content="Disable Filters"
+                            CornerRadius="10" />
+
+                        <Button
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Height="35"
+                            Margin="20,-10,0,20"
+                            HorizontalContentAlignment="Center"
+                            Command="{Binding DefaultFilterCommand}"
+                            Content="Set Default"
+                            CornerRadius="10" />
                     </Grid>
                 </Border>
 
