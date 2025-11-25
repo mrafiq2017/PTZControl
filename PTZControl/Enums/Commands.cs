@@ -13,6 +13,7 @@ namespace PTZControl.Enums
         PanLeft,
         PanRight,
         Stop,
+        IRDigitalZoom,
         IRManualZoom,
         IRZoomIn,
         IRZoomOut,

@@ -28,6 +28,8 @@ public partial class MainViewModel : ViewModelBase
     public ObservableCollection<string> ComPorts { get; } = new();
     public ObservableCollection<int> BaudRates { get; } = new();
 
+    private readonly int IRMaxDigitalZoom = 80;
+    private readonly int IRMinDigitalZoom = 10;
     private readonly int IRMaxZoom = 37801;
     private readonly int IRMinZoom = 24194;
     private readonly int DTVMaxZoom = 980;
@@ -77,6 +79,9 @@ public partial class MainViewModel : ViewModelBase
 
     [ObservableProperty]
     private string iRAbsoluteZoomValue = "0";
+
+    [ObservableProperty]
+    private string iRDigitalZoomValue = "0";
 
     [ObservableProperty]
     private string tcpReply = "";
@@ -271,6 +276,28 @@ public partial class MainViewModel : ViewModelBase
         string hex = currentZoom.ToString("X4");
         string result = hex.Insert(2, " ");
         HexString = $"ff 02 00 4f {result}";
+        await SendHex();
+    }
+
+    [RelayCommand]
+    private async Task IRDigitalZoom()
+    {
+        CurrentCommand = Commands.IRDigitalZoom;
+        int step = int.Parse(IRDigitalZoomValue);
+
+        if (step > IRMaxDigitalZoom)
+        {
+            step = IRMaxDigitalZoom;
+        }
+
+        if (step < IRMinDigitalZoom)
+        {
+            step = IRMinDigitalZoom;
+        }
+
+        string hex = step.ToString("X4");
+        string result = hex.Insert(2, " ");
+        HexString = $"ff 02 E0 35 {result}";
         await SendHex();
     }
 

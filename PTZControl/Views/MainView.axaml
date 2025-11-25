@@ -614,6 +614,31 @@
                             CornerRadius="10" />
 
                         <TextBox
+                            Grid.Row="2"
+                            Grid.Column="2"
+                            Width="60"
+                            Height="38"
+                            Margin="-200,20,0,0"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Background="#FAFAFA"
+                            BorderBrush="#CCCCCC"
+                            BorderThickness="1"
+                            CornerRadius="10"
+                            FontSize="14"
+                            Text="{Binding IRDigitalZoomValue}" />
+
+                        <Button
+                            Grid.Row="2"
+                            Grid.Column="3"
+                            Height="35"
+                            Margin="-120,20,0,0"
+                            HorizontalContentAlignment="Center"
+                            Command="{Binding IRDigitalZoomCommand}"
+                            Content="D-Zoom"
+                            CornerRadius="10" />
+
+                        <TextBox
                             Grid.Row="1"
                             Grid.Column="3"
                             Width="60"
@@ -655,7 +680,7 @@
                 <Border
                     Grid.Row="5"
                     Width="750"
-                    Height="200"
+                    Height="150"
                     Margin="20,10,0,0"
                     Padding="20"
                     HorizontalAlignment="Left"
@@ -672,12 +697,12 @@
 
                         <ScrollViewer
                             Width="700"
-                            Height="200"
+                            Height="120"
                             HorizontalScrollBarVisibility="Auto"
                             VerticalScrollBarVisibility="Auto">
                             <TextBox
                                 x:Name="tcpReplyTextBox"
-                                Height="180"
+                                Height="120"
                                 Padding="8"
                                 AcceptsReturn="True"
                                 Background="#F4F4F4"
