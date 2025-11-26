@@ -1,11 +1,7 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Avalonia.Controls;
-using Avalonia.Input;
-using Avalonia.Interactivity;
+﻿using Avalonia.Controls;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using PTZControl.ViewModels;
+using System;
 
 namespace PTZControl.Views;
 
@@ -19,7 +15,7 @@ public partial class MainView : UserControl
 
     private void OnValueChange(object sender, SelectionChangedEventArgs e)
     {
-        
+
     }
 
     private void UserControl_ActualThemeVariantChanged(object? sender, EventArgs e)

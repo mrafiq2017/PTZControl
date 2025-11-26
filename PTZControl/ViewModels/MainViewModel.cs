@@ -87,6 +87,9 @@ public partial class MainViewModel : ViewModelBase
     private string tcpReply = "";
 
     [ObservableProperty]
+    private string tcpSent= "";
+
+    [ObservableProperty]
     private string focusDTVValue = "0";
 
     [ObservableProperty]
@@ -100,6 +103,9 @@ public partial class MainViewModel : ViewModelBase
 
     [ObservableProperty]
     private Commands currentCommand;
+
+    [ObservableProperty]
+    private int pTReplyCount;
 
     #endregion
 
@@ -127,11 +133,7 @@ public partial class MainViewModel : ViewModelBase
                 _tcpClient = new TcpClient();
                 await _tcpClient.ConnectAsync(IpAddress, port);
                 _stream = _tcpClient.GetStream();
-                if(CurrentCommand.ToString() != Commands.TiltUp.ToString() || CurrentCommand.ToString() != Commands.TiltDown.ToString()
-                    || CurrentCommand.ToString() != Commands.PanLeft.ToString() || CurrentCommand.ToString() != Commands.PanRight.ToString())
-                {
-                    StartReceiving();
-                }
+                StartReceiving();
             }
 
             if (!string.IsNullOrEmpty(HexString))
@@ -167,56 +169,49 @@ public partial class MainViewModel : ViewModelBase
 
         try
         {
-            if (CurrentCommand.ToString() != Commands.TiltUp.ToString() || CurrentCommand.ToString() != Commands.TiltDown.ToString()
-                    || CurrentCommand.ToString() != Commands.PanLeft.ToString() || CurrentCommand.ToString() != Commands.PanRight.ToString())
+            while (_tcpClient?.Connected == true)
             {
-                while (_tcpClient?.Connected == true)
+                int bytesRead = await _stream.ReadAsync(buffer, 0, buffer.Length);
+                if (bytesRead == 0)
+                    break;
+
+                recvBuffer.AddRange(buffer.Take(bytesRead));
+
+                while (recvBuffer.Count >= 7)
                 {
-                    int bytesRead = await _stream.ReadAsync(buffer, 0, buffer.Length);
-                    if (bytesRead == 0)
-                        break;
+                    byte[] packet = recvBuffer.Take(7).ToArray();
+                    recvBuffer.RemoveRange(0, 7);
 
-                    recvBuffer.AddRange(buffer.Take(bytesRead));
-                    Array.Clear(buffer, 0, buffer.Length);
+                    byte b5 = packet[4];
+                    byte b6 = packet[5];
+                    int decB5 = b5;
+                    int decB6 = b6;
+                    int combinedDec = (b5 << 8) | b6;
 
-                    while (recvBuffer.Count >= 7)
-                    {
-                        byte[] packet = recvBuffer.Take(7).ToArray();
-                        recvBuffer.RemoveRange(0, 7);
+                    string hex = BitConverter.ToString(packet)
+                                             .Replace("-", " ")
+                                             .ToLower();
 
-                        byte b5 = packet[4];
-                        byte b6 = packet[5];
-                        int decB5 = b5;
-                        int decB6 = b6;
-                        int combinedDec = (b5 << 8) | b6;
+                    //if (CurrentCommand.ToString() == Commands.DTVZoomPos.ToString())
+                    //{
+                    //    ZoomDefaultDTVValue = combinedDec;
+                    //}
 
-                        string hex = BitConverter.ToString(packet)
-                                                 .Replace("-", " ")
-                                                 .ToLower();
+                    //if (CurrentCommand.ToString() == Commands.IRZoomPos.ToString())
+                    //{
+                    //    ZoomDefaultIRValue = combinedDec;
+                    //}
 
-                        //if (CurrentCommand.ToString() == Commands.DTVZoomPos.ToString())
-                        //{
-                        //    ZoomDefaultDTVValue = combinedDec;
-                        //}
-
-                        //if (CurrentCommand.ToString() == Commands.IRZoomPos.ToString())
-                        //{
-                        //    ZoomDefaultIRValue = combinedDec;
-                        //}
-
-                        TcpReply += $"Receive : {DateTime.Now:HH:mm:ss}  {hex} | {CurrentCommand.ToString()} Value : {combinedDec}"
-                                    + Environment.NewLine;
-                    }
+                    TcpReply = $"Receive : {DateTime.Now:HH:mm:ss}  {hex} | {CurrentCommand.ToString()} Value : {combinedDec}"
+                                + Environment.NewLine;
                 }
+                Array.Clear(buffer, 0, buffer.Length);
+                recvBuffer.Clear();
             }            
         }
         catch (Exception ex)
         {
             TcpReply += $"Receive error: {ex.Message}\n" + System.Environment.NewLine;
-        }
-        finally
-        {
-            recvBuffer.Clear();
         }
     }
 
@@ -227,6 +222,7 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private async Task MoveUp()
     {
+        PTReplyCount = 0;
         CurrentCommand = Commands.TiltUp;
         if (string.IsNullOrEmpty(TiltSpeed))
             TiltSpeed = "00";
@@ -238,6 +234,7 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private async Task MoveDown()
     {
+        PTReplyCount = 0;
         CurrentCommand = Commands.TiltDown;
         if (string.IsNullOrEmpty(TiltSpeed))
             TiltSpeed = "00";
@@ -249,6 +246,7 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private async Task MoveLeft()
     {
+        PTReplyCount = 0;
         CurrentCommand = Commands.PanLeft;
         if (string.IsNullOrEmpty(PanSpeed))
             PanSpeed = "00";
@@ -260,6 +258,7 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private async Task MoveRight()
     {
+        PTReplyCount = 0;
         CurrentCommand = Commands.PanRight;
         if (string.IsNullOrEmpty(PanSpeed))
             PanSpeed = "00";
@@ -618,7 +617,7 @@ public partial class MainViewModel : ViewModelBase
 
             packet[6] = checksum;
 
-            TcpReply += $"Sent : {DateTime.Now:HH:mm:ss}  {hexInput + " " + checksum.ToString("X2")}\n" + System.Environment.NewLine;
+            TcpSent = $"Sent : {DateTime.Now:HH:mm:ss}  {hexInput + " " + checksum.ToString("X2")}\n" + System.Environment.NewLine;
 
             return packet;
         }

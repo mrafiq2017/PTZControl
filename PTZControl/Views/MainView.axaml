@@ -712,14 +712,13 @@
                 </Border>
 
                 <Border
-                    Grid.Row="5"
+                    Grid.Row="4"
                     Width="750"
-                    Height="150"
+                    Height="70"
                     Margin="20,10,0,0"
                     Padding="20"
                     HorizontalAlignment="Left"
                     Background="White"
-                    BorderBrush="#CCCCCC"
                     BorderThickness="1"
                     CornerRadius="20">
 
@@ -729,25 +728,55 @@
                         Orientation="Horizontal"
                         Spacing="10">
 
-                        <ScrollViewer
+                        <TextBox
+                            x:Name="tcpSentTextBox"
                             Width="700"
-                            Height="120"
-                            HorizontalScrollBarVisibility="Auto"
-                            VerticalScrollBarVisibility="Auto">
-                            <TextBox
-                                x:Name="tcpReplyTextBox"
-                                Height="120"
-                                Padding="8"
-                                AcceptsReturn="True"
-                                Background="#F4F4F4"
-                                BorderBrush="#888"
-                                BorderThickness="1"
-                                FontFamily="Consolas"
-                                FontSize="14"
-                                IsReadOnly="True"
-                                Text="{Binding TcpReply}"
-                                TextWrapping="Wrap" />
-                        </ScrollViewer>
+                            Height="50"
+                            Padding="8"
+                            AcceptsReturn="True"
+                            Background="#F4F4F4"
+                            BorderBrush="#888"
+                            BorderThickness="1"
+                            FontFamily="Consolas"
+                            FontSize="14"
+                            IsReadOnly="True"
+                            Text="{Binding TcpSent}"
+                            TextWrapping="Wrap" />
+
+                    </StackPanel>
+                </Border>
+
+                <Border
+                    Grid.Row="5"
+                    Width="750"
+                    Height="70"
+                    Margin="20,0,0,0"
+                    Padding="20"
+                    HorizontalAlignment="Left"
+                    Background="White"
+                    BorderThickness="1"
+                    CornerRadius="20">
+
+                    <StackPanel
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal"
+                        Spacing="10">
+
+                        <TextBox
+                            x:Name="tcpReplyTextBox"
+                            Width="700"
+                            Height="50"
+                            Padding="8"
+                            AcceptsReturn="True"
+                            Background="#F4F4F4"
+                            BorderBrush="#888"
+                            BorderThickness="1"
+                            FontFamily="Consolas"
+                            FontSize="14"
+                            IsReadOnly="True"
+                            Text="{Binding TcpReply}"
+                            TextWrapping="Wrap" />
 
                     </StackPanel>
                 </Border>
