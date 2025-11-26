@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
-using System.IO.Ports;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
-using Avalonia;
-using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PTZControl.Enums;
@@ -24,6 +20,7 @@ public partial class MainViewModel : ViewModelBase
     private NetworkStream? _stream;
     byte[] buffer = new byte[1024];
     List<byte> recvBuffer = new List<byte>();
+    private readonly Queue<string> replyQueue = new Queue<string>(3);
 
     public ObservableCollection<string> ComPorts { get; } = new();
     public ObservableCollection<int> BaudRates { get; } = new();
@@ -87,7 +84,7 @@ public partial class MainViewModel : ViewModelBase
     private string tcpReply = "";
 
     [ObservableProperty]
-    private string tcpSent= "";
+    private string tcpSent = "";
 
     [ObservableProperty]
     private string focusDTVValue = "0";
@@ -111,7 +108,7 @@ public partial class MainViewModel : ViewModelBase
 
     public MainViewModel()
     {
-        
+
     }
 
     #region TCP 
@@ -202,12 +199,22 @@ public partial class MainViewModel : ViewModelBase
                     //    ZoomDefaultIRValue = combinedDec;
                     //}
 
-                    TcpReply = $"Receive : {DateTime.Now:HH:mm:ss}  {hex} | {CurrentCommand.ToString()} Value : {combinedDec}"
+                    var reply = $"Receive : {DateTime.Now:HH:mm:ss}  {hex} | {CurrentCommand.ToString()} Value : {combinedDec}"
                                 + Environment.NewLine;
+
+                    if (replyQueue.Count == 3)
+                        replyQueue.Dequeue();
+
+                    replyQueue.Enqueue(reply);
+
+                    // Update TcpReply
+                    TcpReply = string.Join(Environment.NewLine, replyQueue) + Environment.NewLine;
+
+
                 }
                 Array.Clear(buffer, 0, buffer.Length);
                 recvBuffer.Clear();
-            }            
+            }
         }
         catch (Exception ex)
         {

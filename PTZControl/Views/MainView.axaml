@@ -338,9 +338,10 @@
 
                         <Button
                             Grid.Row="0"
-                            Grid.Column="0"
+                            Grid.Column="1"
                             Height="35"
-                            Margin="0,-10,0,20"
+                            Width="100"
+                            Margin="-80,-10,0,20"
                             HorizontalContentAlignment="Center"
                             Command="{Binding EnableFilterCommand}"
                             Content="Enable Filters"
@@ -350,7 +351,8 @@
                             Grid.Row="0"
                             Grid.Column="1"
                             Height="35"
-                            Margin="-150,-10,0,20"
+                            Width="120"
+                            Margin="140,-10,0,20"
                             HorizontalContentAlignment="Center"
                             Command="{Binding DisableFilterCommand}"
                             Content="Disable Filters"
@@ -360,7 +362,8 @@
                             Grid.Row="0"
                             Grid.Column="1"
                             Height="35"
-                            Margin="20,-10,0,20"
+                            Width="100"
+                            Margin="30,-10,0,20"
                             HorizontalContentAlignment="Center"
                             Command="{Binding DefaultFilterCommand}"
                             Content="Set Default"
@@ -714,8 +717,8 @@
                 <Border
                     Grid.Row="4"
                     Width="750"
-                    Height="70"
-                    Margin="20,10,0,0"
+                    Height="50"
+                    Margin="20,0,0,0"
                     Padding="20"
                     HorizontalAlignment="Left"
                     Background="White"
@@ -731,7 +734,7 @@
                         <TextBox
                             x:Name="tcpSentTextBox"
                             Width="700"
-                            Height="50"
+                            Height="30"
                             Padding="8"
                             AcceptsReturn="True"
                             Background="#F4F4F4"
@@ -749,8 +752,8 @@
                 <Border
                     Grid.Row="5"
                     Width="750"
-                    Height="70"
-                    Margin="20,0,0,0"
+                    Height="100"
+                    Margin="20,-5,0,0"
                     Padding="20"
                     HorizontalAlignment="Left"
                     Background="White"
@@ -763,10 +766,16 @@
                         Orientation="Horizontal"
                         Spacing="10">
 
-                        <TextBox
+                        <ScrollViewer
+                        Width="700"
+                        Height="100"
+                        HorizontalScrollBarVisibility="Auto"
+                        VerticalScrollBarVisibility="Auto">
+
+							<TextBox
                             x:Name="tcpReplyTextBox"
                             Width="700"
-                            Height="50"
+                            Height="100"
                             Padding="8"
                             AcceptsReturn="True"
                             Background="#F4F4F4"
@@ -778,6 +787,7 @@
                             Text="{Binding TcpReply}"
                             TextWrapping="Wrap" />
 
+                        </ScrollViewer>
                     </StackPanel>
                 </Border>
 
