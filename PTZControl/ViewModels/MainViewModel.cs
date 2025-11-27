@@ -179,22 +179,20 @@ public partial class MainViewModel : ViewModelBase
                                              .Replace("-", " ")
                                              .ToLower();
 
-                    var reply = $"Receive : {DateTime.Now:HH:mm:ss}  {hex} | {CurrentCommand.ToString()} Value : {combinedDec}"
-                                + Environment.NewLine;
+                    var reply = $"Receive : {DateTime.Now:HH:mm:ss}  {hex} | {CurrentCommand.ToString()} Value : {combinedDec}";
 
                     if (replyQueue.Count == 3)
                         replyQueue.Dequeue();
 
                     replyQueue.Enqueue(reply);
 
-                    // Update TcpReply
-                    TcpReply = string.Join(Environment.NewLine, replyQueue) + Environment.NewLine;
+                    TcpReply = string.Join(Environment.NewLine, replyQueue);
                 }
             }
         }
         catch (OperationCanceledException)
         {
-            // Normal cancellation
+            
         }
         catch (Exception ex)
         {
