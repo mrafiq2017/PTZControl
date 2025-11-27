@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -9,6 +10,7 @@ using Avalonia.Controls.Shapes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PTZControl.Enums;
+using PTZControl.Common;
 
 namespace PTZControl.ViewModels;
 
@@ -18,34 +20,14 @@ public partial class MainViewModel : ViewModelBase
 
     private TcpClient? _tcpClient;
     private NetworkStream? _stream;
-    byte[] buffer = new byte[1024];
     List<byte> recvBuffer = new List<byte>();
     private readonly Queue<string> replyQueue = new Queue<string>(3);
-
-    public ObservableCollection<string> ComPorts { get; } = new();
-    public ObservableCollection<int> BaudRates { get; } = new();
-
-    private readonly int IRMaxDigitalZoom = 80;
-    private readonly int IRMinDigitalZoom = 10;
-    private readonly int IRMaxZoom = 37801;
-    private readonly int IRMinZoom = 24194;
-    private readonly int DTVMaxZoom = 980;
-    private readonly int DTVMinZoom = 28;
 
     [ObservableProperty]
     private string ipAddress = "192.168.1.100";
 
     [ObservableProperty]
     private string hexString;
-
-    [ObservableProperty]
-    private int selectedBaudRate;
-
-    [ObservableProperty]
-    private string connectionStatus = "Connect";
-
-    [ObservableProperty]
-    private bool isConnected = false;
 
     [ObservableProperty]
     private string panSpeed = "00";
@@ -113,6 +95,8 @@ public partial class MainViewModel : ViewModelBase
 
     #region TCP 
 
+    private CancellationTokenSource? _cts;
+
     [RelayCommand]
     private async Task SendHex()
     {
@@ -125,12 +109,16 @@ public partial class MainViewModel : ViewModelBase
             }
             int.TryParse(TcpPort, out int port);
 
-            if (_tcpClient == null)
+            if (_tcpClient == null || !_tcpClient.Connected)
             {
+                _tcpClient?.Dispose();
                 _tcpClient = new TcpClient();
                 await _tcpClient.ConnectAsync(IpAddress, port);
                 _stream = _tcpClient.GetStream();
-                StartReceiving();
+                
+                _cts?.Cancel();
+                _cts = new CancellationTokenSource();
+                _ = StartReceiving(_cts.Token);
             }
 
             if (!string.IsNullOrEmpty(HexString))
@@ -139,36 +127,38 @@ public partial class MainViewModel : ViewModelBase
 
                 if (bytes == null || bytes.Length == 0)
                 {
-                    ConnectionStatus = "Invalid HEX";
                     return;
                 }
 
                 try
                 {
-                    await _stream.WriteAsync(bytes, 0, bytes.Length);
-                    ConnectionStatus = $"Sent {bytes.Length} bytes";
+                    if (_stream != null)
+                    {
+                        await _stream.WriteAsync(bytes, 0, bytes.Length);
+                    }
                 }
                 catch (Exception ex)
                 {
-                    ConnectionStatus = $"Send failed: {ex.Message}";
                 }
             }
         }
         catch (Exception ex)
         {
-
         }
     }
 
-    private async void StartReceiving()
+    private async Task StartReceiving(CancellationToken ct)
     {
+        recvBuffer.Clear();
         byte[] buffer = new byte[1024];
 
         try
         {
-            while (_tcpClient?.Connected == true)
+            while (_tcpClient?.Connected == true && !ct.IsCancellationRequested)
             {
-                int bytesRead = await _stream.ReadAsync(buffer, 0, buffer.Length);
+                if (_stream == null) break;
+
+                int bytesRead = await _stream.ReadAsync(buffer, 0, buffer.Length, ct);
                 if (bytesRead == 0)
                     break;
 
@@ -189,16 +179,6 @@ public partial class MainViewModel : ViewModelBase
                                              .Replace("-", " ")
                                              .ToLower();
 
-                    //if (CurrentCommand.ToString() == Commands.DTVZoomPos.ToString())
-                    //{
-                    //    ZoomDefaultDTVValue = combinedDec;
-                    //}
-
-                    //if (CurrentCommand.ToString() == Commands.IRZoomPos.ToString())
-                    //{
-                    //    ZoomDefaultIRValue = combinedDec;
-                    //}
-
                     var reply = $"Receive : {DateTime.Now:HH:mm:ss}  {hex} | {CurrentCommand.ToString()} Value : {combinedDec}"
                                 + Environment.NewLine;
 
@@ -209,12 +189,12 @@ public partial class MainViewModel : ViewModelBase
 
                     // Update TcpReply
                     TcpReply = string.Join(Environment.NewLine, replyQueue) + Environment.NewLine;
-
-
                 }
-                Array.Clear(buffer, 0, buffer.Length);
-                recvBuffer.Clear();
             }
+        }
+        catch (OperationCanceledException)
+        {
+            // Normal cancellation
         }
         catch (Exception ex)
         {
@@ -294,9 +274,9 @@ public partial class MainViewModel : ViewModelBase
         int step = int.Parse(IRAbsoluteZoomValue);
         currentZoom = step;
 
-        if (currentZoom > IRMaxZoom)
+        if (currentZoom > Constants.IRMaxZoom)
         {
-            currentZoom = IRMaxZoom;
+            currentZoom = Constants.IRMaxZoom;
             TcpReply = $"Error : {DateTime.Now:HH:mm:ss}  Cannot zoom greater than 37,801."
                                 + Environment.NewLine;
         }
@@ -314,14 +294,14 @@ public partial class MainViewModel : ViewModelBase
         CurrentCommand = Commands.IRDigitalZoom;
         int step = int.Parse(IRDigitalZoomValue);
 
-        if (step > IRMaxDigitalZoom)
+        if (step > Constants.IRMaxDigitalZoom)
         {
-            step = IRMaxDigitalZoom;
+            step = Constants.IRMaxDigitalZoom;
         }
 
-        if (step < IRMinDigitalZoom)
+        if (step < Constants.IRMinDigitalZoom)
         {
-            step = IRMinDigitalZoom;
+            step = Constants.IRMinDigitalZoom;
         }
 
         string hex = step.ToString("X4");
@@ -339,9 +319,9 @@ public partial class MainViewModel : ViewModelBase
         int step = int.Parse(ZoomIRValue);
         currentZoom += step;
 
-        if (currentZoom > IRMaxZoom)
+        if (currentZoom > Constants.IRMaxZoom)
         {
-            currentZoom = IRMaxZoom;
+            currentZoom = Constants.IRMaxZoom;
             TcpReply = $"Error : {DateTime.Now:HH:mm:ss}  Cannot zoom greater than 37,801."
                                 + Environment.NewLine;
         }
@@ -360,9 +340,9 @@ public partial class MainViewModel : ViewModelBase
         int currentZoom = ZoomDefaultIRValue;
         int step = int.Parse(ZoomIRValue);
         currentZoom -= step;
-        if (currentZoom < IRMinZoom)
+        if (currentZoom < Constants.IRMinZoom)
         {
-            currentZoom = IRMinZoom;
+            currentZoom = Constants.IRMinZoom;
         }
         ZoomDefaultIRValue = currentZoom;
         string hex = currentZoom.ToString("X4");
@@ -375,7 +355,7 @@ public partial class MainViewModel : ViewModelBase
     private async Task IRNarrowFOV()
     {
         CurrentCommand = Commands.IRNarrowFOV;
-        ZoomDefaultIRValue = IRMaxZoom;
+        ZoomDefaultIRValue = Constants.IRMaxZoom;
         HexString = $"ff 02 00 20 00 00";
         await SendHex();
     }
@@ -384,7 +364,7 @@ public partial class MainViewModel : ViewModelBase
     private async Task IRWideFOV()
     {
         CurrentCommand = Commands.IRWideFOV;
-        ZoomDefaultIRValue = IRMinZoom;
+        ZoomDefaultIRValue = Constants.IRMinZoom;
         HexString = $"ff 02 00 40 00 00";
         await SendHex();
     }
@@ -423,9 +403,9 @@ public partial class MainViewModel : ViewModelBase
         int step = int.Parse(DTVAbsoluteZoomValue);
         currentZoom = step;
 
-        if (currentZoom > DTVMaxZoom)
+        if (currentZoom > Constants.DTVMaxZoom)
         {
-            currentZoom = DTVMaxZoom;
+            currentZoom = Constants.DTVMaxZoom;
             TcpReply = $"Info : {DateTime.Now:HH:mm:ss}  Maximum zoom is 980."
                                 + Environment.NewLine;
         }
@@ -446,9 +426,9 @@ public partial class MainViewModel : ViewModelBase
         int step = int.Parse(ZoomDTVValue);
         currentZoom += step;
 
-        if (currentZoom > DTVMaxZoom)
+        if (currentZoom > Constants.DTVMaxZoom)
         {
-            currentZoom = DTVMaxZoom;
+            currentZoom = Constants.DTVMaxZoom;
             TcpReply = $"Info : {DateTime.Now:HH:mm:ss}  Maximum zoom is 980."
                                 + Environment.NewLine;
         }
@@ -467,9 +447,9 @@ public partial class MainViewModel : ViewModelBase
         int currentZoom = ZoomDefaultDTVValue;
         int step = int.Parse(ZoomDTVValue);
         currentZoom -= step;
-        if (currentZoom < DTVMinZoom)
+        if (currentZoom < Constants.DTVMinZoom)
         {
-            currentZoom = DTVMinZoom;
+            currentZoom = Constants.DTVMinZoom;
         }
         ZoomDefaultDTVValue = currentZoom;
         string hex = currentZoom.ToString("X4");
@@ -482,7 +462,7 @@ public partial class MainViewModel : ViewModelBase
     private async Task DTVNarrowFOV()
     {
         CurrentCommand = Commands.DTVWideFOV;
-        ZoomDefaultDTVValue = DTVMaxZoom;
+        ZoomDefaultDTVValue = Constants.DTVMaxZoom;
         HexString = $"ff 01 00 20 00 00";
         await SendHex();
     }
@@ -491,7 +471,7 @@ public partial class MainViewModel : ViewModelBase
     private async Task DTVWideFOV()
     {
         CurrentCommand = Commands.DTVNarrowFOV;
-        ZoomDefaultDTVValue = DTVMinZoom;
+        ZoomDefaultDTVValue = Constants.DTVMinZoom;
         HexString = $"ff 01 00 40 00 00";
         await SendHex();
     }

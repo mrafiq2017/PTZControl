@@ -10,789 +10,283 @@
     x:DataType="vm:MainViewModel"
     mc:Ignorable="d">
 
-    <Grid Margin="0" RowDefinitions="Auto,Auto,Auto,*">
+    <UserControl.Styles>
+        <!--  Common TextBlock Style  -->
+        <Style Selector="TextBlock.Label">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
 
-        <!--  Connection Bar - Top Center  -->
-        <Border
-            Grid.Row="0"
-            Margin="0,10,0,10"
-            Padding="125,20"
-            HorizontalAlignment="Center"
-            Background="White"
-            BorderBrush="#E0E0E0"
-            BorderThickness="1"
-            BoxShadow="0 4 20 0 #20000000"
-            CornerRadius="12">
+        <!--  Common TextBox Style  -->
+        <Style Selector="TextBox">
+            <Setter Property="Height" Value="38" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="Background" Value="#FAFAFA" />
+            <Setter Property="BorderBrush" Value="#CCCCCC" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="FontSize" Value="14" />
+        </Style>
 
+        <!--  Common Button Style  -->
+        <Style Selector="Button">
+            <Setter Property="Height" Value="38" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
+        <Style Selector="Button.Primary">
+             <Setter Property="Background" Value="#0078D4" />
+             <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="Button.Primary:pointerover">
+            <Setter Property="Background" Value="#0062AD" />
+             <Setter Property="Foreground" Value="White" />
+        </Style>
+
+        <!--  Card/Border Style  -->
+        <Style Selector="Border.Card">
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="#E0E0E0" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="BoxShadow" Value="0 2 10 0 #10000000" />
+            <Setter Property="Margin" Value="0,0,0,15" />
+            <Setter Property="Padding" Value="20" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid Margin="20" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,*">
+
+        <!--  Row 0: Connection Settings  -->
+        <Border Grid.Row="0" Classes="Card">
             <StackPanel
-                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
                 Orientation="Horizontal"
                 Spacing="20">
-
-                <!--  IP Address  -->
-                <TextBlock
-                    VerticalAlignment="Center"
-                    FontSize="14"
-                    FontWeight="SemiBold"
-                    Text="IP Address:" />
+                <TextBlock Classes="Label" Text="IP Address:" />
                 <TextBox
                     Width="170"
-                    Height="38"
-                    Padding="12,0"
-                    VerticalContentAlignment="Center"
-                    Background="#FAFAFA"
-                    BorderBrush="#CCCCCC"
-                    BorderThickness="1"
-                    CornerRadius="10"
-                    FontSize="14"
                     Text="{Binding IpAddress}"
                     Watermark="192.168.1.100" />
 
-                <!--  Port  -->
-                <TextBlock
-                    VerticalAlignment="Center"
-                    FontSize="14"
-                    FontWeight="SemiBold"
-                    Text="Port:" />
+                <TextBlock Classes="Label" Text="Port:" />
                 <TextBox
-                    Width="170"
-                    Height="38"
-                    Padding="12,0"
-                    VerticalContentAlignment="Center"
-                    Background="#FAFAFA"
-                    BorderBrush="#CCCCCC"
-                    BorderThickness="1"
-                    CornerRadius="10"
-                    FontSize="14"
+                    Width="100"
                     Text="{Binding TcpPort}"
                     Watermark="1470" />
-
-                <!--  Baud Rate  -->
-                <!--<TextBlock Text="Baud Rate:"
-                           FontSize="14"
-                           FontWeight="SemiBold"
-                           VerticalAlignment="Center"/>
-                <ComboBox Width="130"
-                          Height="38"
-                          FontSize="14"
-                          ItemsSource="{Binding BaudRates}"
-                          SelectedItem="{Binding SelectedBaudRate}"
-                          SelectionChanged="OnValueChange"
-                          PlaceholderText="9600"
-                          CornerRadius="10"
-                          Background="#FAFAFA"
-                          BorderBrush="#CCCCCC"
-                          VerticalContentAlignment="Center"
-                          Padding="12,0"/>-->
-
-                <!--<Button Content="{Binding ConnectionStatus}"
-                    Width="120"
-                    Height="38"
-                    FontSize="14"
-                    FontWeight="SemiBold"
-                    CornerRadius="10"
-                    BorderThickness="0"
-                    Cursor="Hand"
-                    Command="{Binding ConnectCommand}"
-                    VerticalAlignment="Center"
-                    HorizontalContentAlignment="Center"
-                    VerticalContentAlignment="Center">
-            </Button>-->
-
             </StackPanel>
         </Border>
 
-        <Border
-            Grid.Row="1"
-            Margin="0,10,0,10"
-            Padding="28,20"
-            HorizontalAlignment="Center"
-            Background="White"
-            BorderBrush="#E0E0E0"
-            BorderThickness="1"
-            CornerRadius="12">
-
-            <StackPanel
-                VerticalAlignment="Top"
-                Orientation="Horizontal"
-                Spacing="20">
-
-                <!--  Hex String  -->
+        <!--  Row 1: Hex Command  -->
+        <Border Grid.Row="1" Classes="Card">
+            <Grid ColumnDefinitions="Auto,*,Auto">
                 <TextBlock
-                    VerticalAlignment="Center"
-                    FontSize="14"
-                    FontWeight="SemiBold"
+                    Grid.Column="0"
+                    Margin="0,0,15,0"
+                    Classes="Label"
                     Text="HEX" />
                 <TextBox
-                    Width="515"
-                    Height="38"
-                    Padding="12,0"
-                    VerticalContentAlignment="Center"
-                    Background="#FAFAFA"
-                    BorderBrush="#CCCCCC"
-                    BorderThickness="1"
-                    CornerRadius="10"
-                    FontSize="14"
+                    Grid.Column="1"
+                    Margin="0,0,15,0"
                     Text="{Binding HexString}" />
-
                 <Button
-                    Width="120"
-                    Height="38"
-                    VerticalAlignment="Center"
-                    HorizontalContentAlignment="Center"
-                    VerticalContentAlignment="Center"
-                    BorderThickness="0"
+                    Grid.Column="2"
+                    Width="100"
+                    Classes="Primary"
                     Command="{Binding SendHexCommand}"
-                    Content="Send"
-                    CornerRadius="10"
-                    Cursor="Hand"
-                    FontSize="14"
-                    FontWeight="SemiBold" />
-
-            </StackPanel>
+                    Content="Send" />
+            </Grid>
         </Border>
 
-        <!--  Full-width dark control bar – exactly what you want  -->
-        <Border Grid.Row="2" CornerRadius="0">
+        <!--  Row 2: PTZ Control & Filters  -->
+        <Grid Grid.Row="2" ColumnDefinitions="Auto,*" Margin="0,0,0,15">
+            <!--  Left: Joystick  -->
+            <Border
+                Grid.Column="0"
+                Width="250"
+                Height="200"
+                Margin="0,0,20,0"
+                Classes="Card">
+                <Grid ColumnDefinitions="*,*,*" RowDefinitions="*,*,*" Margin="25,0,0,0">
+                    <!--  Up  -->
+                    <Button
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Command="{Binding MoveUpCommand}"
+                        Content="🢁" />
+                    <!--  Left  -->
+                    <Button
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Command="{Binding MoveLeftCommand}"
+                        Content="🢀" />
+                    <!--  Stop  -->
+                    <Button
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Width="35"
+                        CornerRadius="50"
+                        Background="#D32F2F"
+                        Command="{Binding StopMotorCommand}"
+                        Content=""
+                        Margin="-1 0 0 0"
+                        Foreground="White"
+                        FontWeight="Bold">
+                        <Button.Styles>
+                             <Style Selector="Button:pointerover">
+                                <Setter Property="Background" Value="#B71C1C" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Style>
+                        </Button.Styles>
+                    </Button>
+                    <!--  Right  -->
+                    <Button
+                        Grid.Row="1"
+                        Grid.Column="2"
+                        Command="{Binding MoveRightCommand}"
+                        Content="🢂" />
+                    <!--  Down  -->
+                    <Button
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        Command="{Binding MoveDownCommand}"
+                        Content="🢃" />
+                </Grid>
+            </Border>
 
-            <Grid
-                HorizontalAlignment="Stretch"
-                ColumnDefinitions="*, *"
-                RowDefinitions="*,*,*,*,*,*">
-
-                <!--  LEFT: PTZ Joystick (fixed width, perfectly centered)  -->
-                <Border
-                    Grid.Row="1"
-                    Width="750"
-                    Margin="20,10,0,0"
-                    Padding="10,10,10,10"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Center"
-                    BorderBrush="#E0E0E0"
-                    BorderThickness="1"
-                    CornerRadius="20">
-
-                    <Grid ColumnDefinitions="*,*,*" RowDefinitions="*,*,*">
-
-                        <!--  Up Arrow  -->
-                        <Button
-                            Name="moveUp"
-                            Grid.Row="0"
-                            Grid.Column="1"
-                            Width="100"
-                            Height="30"
-                            Margin="0,0,0,10"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding MoveUpCommand}"
-                            CommandParameter="Up"
-                            Content="🢁"
-                            CornerRadius="10"
-                            FontSize="16" />
-
-                        <!--  Left Arrow  -->
-                        <Button
-                            Name="moveLeft"
-                            Grid.Row="1"
-                            Grid.Column="0"
-                            Width="100"
-                            Height="30"
-                            Margin="200,0,10,0"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding MoveLeftCommand}"
-                            CommandParameter="Left"
-                            Content="🢀"
-                            CornerRadius="10"
-                            FontSize="16">
-                            <Button.Styles>
-                                <Style Selector="Button:pointerover">
-                                    <Setter Property="Background" Value="#0078D4" />
-                                </Style>
-                                <Style Selector="Button:pressed">
-                                    <Setter Property="Background" Value="#005A9E" />
-                                </Style>
-                            </Button.Styles>
-                        </Button>
-
-                        <!--  STOP (Big Red)  -->
-                        <Button
-                            Grid.Row="1"
-                            Grid.Column="1"
-                            Width="100"
-                            Height="40"
-                            Margin="0,0,0,0"
-                            Padding="0,8,0,0"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding StopMotorCommand}"
-                            Content="STOP"
-                            CornerRadius="10"
-                            FontSize="16">
-                            <Button.Styles>
-                                <Style Selector="Button:pressed">
-                                    <Setter Property="Background" Value="#B71C1C" />
-                                </Style>
-                            </Button.Styles>
-                        </Button>
-
-                        <!--  Right Arrow  -->
-                        <Button
-                            Name="moveRight"
-                            Grid.Row="1"
-                            Grid.Column="2"
-                            Width="100"
-                            Height="30"
-                            Margin="-100,0,0,0"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding MoveRightCommand}"
-                            CommandParameter="Right"
-                            Content="🢂"
-                            CornerRadius="10"
-                            FontSize="16"
-                            Tag="Right">
-                            <Button.Styles>
-                                <Style Selector="Button:pointerover">
-                                    <Setter Property="Background" Value="#0078D4" />
-                                </Style>
-                                <Style Selector="Button:pressed">
-                                    <Setter Property="Background" Value="#005A9E" />
-                                </Style>
-                            </Button.Styles>
-                        </Button>
-
-                        <!--  Down Arrow  -->
-                        <Button
-                            Name="moveDown"
-                            Grid.Row="2"
-                            Grid.Column="1"
-                            Width="100"
-                            Height="30"
-                            Margin="0,10,0,0"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding MoveDownCommand}"
-                            CommandParameter="Down"
-                            Content="🢃"
-                            CornerRadius="10"
-                            FontSize="16">
-                            <Button.Styles>
-                                <Style Selector="Button:pointerover">
-                                    <Setter Property="Background" Value="#0078D4" />
-                                </Style>
-                                <Style Selector="Button:pressed">
-                                    <Setter Property="Background" Value="#005A9E" />
-                                </Style>
-                            </Button.Styles>
-                        </Button>
-                    </Grid>
-                </Border>
-
-                <Border
-                    Grid.Column="0"
-                    Width="750"
-                    Margin="20,10,0,0"
-                    Padding="10,10,10,10"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Center"
-                    CornerRadius="20">
-
-                    <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="*,*">
-
-                        <TextBlock
-                            Grid.Row="1"
-                            Grid.Column="0"
-                            VerticalAlignment="Center"
-                            FontSize="14"
-                            FontWeight="SemiBold"
-                            Text="Tilt Speed" />
-                        <TextBox
-                            Grid.Row="1"
-                            Grid.Column="0"
-                            Width="170"
-                            Height="38"
-                            Margin="100,0,0,0"
-                            Padding="12,0"
-                            VerticalContentAlignment="Center"
-                            BorderThickness="1"
-                            CornerRadius="10"
-                            FontSize="14"
-                            Text="{Binding TiltSpeed}" />
-
-                        <TextBlock
-                            Grid.Row="1"
-                            Grid.Column="1"
-                            Margin="50,0,0,0"
-                            VerticalAlignment="Center"
-                            FontSize="14"
-                            FontWeight="SemiBold"
-                            Text="Pan Speed" />
-                        <TextBox
-                            Grid.Row="1"
-                            Grid.Column="1"
-                            Width="170"
-                            Height="38"
-                            Margin="180,0,0,0"
-                            Padding="12,0"
-                            VerticalContentAlignment="Center"
-                            BorderThickness="1"
-                            CornerRadius="10"
-                            FontSize="14"
-                            Text="{Binding PanSpeed}" />
-
-                        <Button
-                            Grid.Row="0"
-                            Grid.Column="1"
-                            Height="35"
-                            Width="100"
-                            Margin="-80,-10,0,20"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding EnableFilterCommand}"
-                            Content="Enable Filters"
-                            CornerRadius="10" />
-
-                        <Button
-                            Grid.Row="0"
-                            Grid.Column="1"
-                            Height="35"
-                            Width="120"
-                            Margin="140,-10,0,20"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding DisableFilterCommand}"
-                            Content="Disable Filters"
-                            CornerRadius="10" />
-
-                        <Button
-                            Grid.Row="0"
-                            Grid.Column="1"
-                            Height="35"
-                            Width="100"
-                            Margin="30,-10,0,20"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding DefaultFilterCommand}"
-                            Content="Set Default"
-                            CornerRadius="10" />
-                    </Grid>
-                </Border>
-
-                <Border
-                    Grid.Row="2"
-                    Width="750"
-                    Margin="20,10,0,0"
-                    Padding="20"
-                    HorizontalAlignment="Left"
-                    Background="White"
-                    BorderBrush="#CCCCCC"
-                    BorderThickness="1"
-                    CornerRadius="20">
-
-                    <Grid ColumnDefinitions="*,*,*,*,*,*" RowDefinitions="*,*">
-
-                        <TextBlock
-                            Grid.Row="0"
-                            Grid.Column="0"
-                            VerticalAlignment="Center"
-                            FontSize="14"
-                            FontWeight="SemiBold"
-                            Text="DTV" />
-
-                        <TextBlock
-                            Grid.Row="0"
-                            Grid.Column="0"
-                            Margin="-5,-30,0,0"
-                            VerticalAlignment="Center"
-                            FontSize="10"
-                            FontWeight="SemiBold"
-                            Foreground="Red"
-                            Text="*zoom (28 ~ 980)" />
-
-                        <TextBlock
-                            Grid.Row="0"
-                            Grid.Column="1"
-                            Margin="-30,0,0,0"
-                            VerticalAlignment="Center"
-                            FontSize="14"
-                            FontWeight="SemiBold"
-                            Text="{Binding ZoomDefaultDTVValue}" />
-
-                        <TextBox
-                            Grid.Row="0"
-                            Grid.Column="2"
-                            Width="60"
-                            Height="38"
-                            Margin="-200,0,0,0"
-                            HorizontalContentAlignment="Center"
-                            VerticalContentAlignment="Center"
-                            Background="#FAFAFA"
-                            BorderBrush="#CCCCCC"
-                            BorderThickness="1"
-                            CornerRadius="10"
-                            FontSize="14"
-                            Text="{Binding ZoomDTVValue}" />
-
-                        <Button
-                            Grid.Row="0"
-                            Grid.Column="3"
-                            Height="35"
-                            Margin="-120,0,0,0"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding ZoomInDTVCommand}"
-                            Content="Zoom In"
-                            CornerRadius="10" />
-
-                        <Button
-                            Grid.Row="0"
-                            Grid.Column="4"
-                            Height="35"
-                            Margin="-110,0,0,0"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding ZoomOutDTVCommand}"
-                            Content="Zoom Out"
-                            CornerRadius="10" />
-
-                        <Button
-                            Grid.Row="0"
-                            Grid.Column="4"
-                            Height="35"
-                            Margin="20,0,0,0"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding DTVNarrowFOVCommand}"
-                            Content="Narrow FOV"
-                            CornerRadius="10" />
-
-                        <Button
-                            Grid.Row="0"
-                            Grid.Column="5"
-                            Height="35"
-                            Margin="20,0,0,0"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding DTVWideFOVCommand}"
-                            Content="Wide FOV"
-                            CornerRadius="10" />
-
-                        <TextBox
-                            Grid.Row="1"
-                            Grid.Column="2"
-                            Width="60"
-                            Height="38"
-                            Margin="-200,20,0,0"
-                            HorizontalContentAlignment="Center"
-                            VerticalContentAlignment="Center"
-                            Background="#FAFAFA"
-                            BorderBrush="#CCCCCC"
-                            BorderThickness="1"
-                            CornerRadius="10"
-                            FontSize="14"
-                            Text="{Binding DTVAbsoluteZoomValue}" />
-
-                        <Button
-                            Grid.Row="1"
-                            Grid.Column="3"
-                            Height="35"
-                            Margin="-120,20,0,0"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding DTVAbsoluteZoomCommand}"
-                            Content="Zoom"
-                            CornerRadius="10" />
-
-                        <TextBox
-                            Grid.Row="1"
-                            Grid.Column="3"
-                            Width="60"
-                            Height="38"
-                            Margin="50,20,0,0"
-                            HorizontalContentAlignment="Center"
-                            VerticalContentAlignment="Center"
-                            Background="#FAFAFA"
-                            BorderBrush="#CCCCCC"
-                            BorderThickness="1"
-                            CornerRadius="10"
-                            FontSize="14"
-                            Text="{Binding FocusDTVValue}" />
-
-                        <Button
-                            Grid.Row="1"
-                            Grid.Column="4"
-                            Width="100"
-                            Height="35"
-                            Margin="20,20,0,0"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding FocusDTVCommand}"
-                            Content="Focus"
-                            CornerRadius="10" />
-
-                        <Button
-                            Grid.Row="1"
-                            Grid.Column="5"
-                            Height="35"
-                            Margin="20,20,0,0"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding AutoFocusDTVCommand}"
-                            Content="Auto Focus"
-                            CornerRadius="10" />
-
-                    </Grid>
-                </Border>
-
-                <Border
-                    Grid.Row="3"
-                    Width="750"
-                    Margin="20,10,0,0"
-                    Padding="20"
-                    HorizontalAlignment="Left"
-                    Background="White"
-                    BorderBrush="#CCCCCC"
-                    BorderThickness="1"
-                    CornerRadius="20">
-
-                    <Grid ColumnDefinitions="*,*,*,*,*,*" RowDefinitions="*,*,*">
-
-                        <TextBlock
-                            Grid.Row="0"
-                            Grid.Column="0"
-                            VerticalAlignment="Center"
-                            FontSize="14"
-                            FontWeight="SemiBold"
-                            Text="IR" />
-
-                        <TextBlock
-                            Grid.Row="0"
-                            Grid.Column="0"
-                            Margin="-5,-30,0,0"
-                            VerticalAlignment="Center"
-                            FontSize="10"
-                            FontWeight="SemiBold"
-                            Foreground="Red"
-                            Text="*zoom (24194 ~ 37,801)" />
-
-                        <TextBlock
-                            Grid.Row="0"
-                            Grid.Column="1"
-                            Margin="-30,0,0,0"
-                            VerticalAlignment="Center"
-                            FontSize="14"
-                            FontWeight="SemiBold"
-                            Text="{Binding ZoomDefaultIRValue}" />
-
-                        <TextBox
-                            Grid.Row="0"
-                            Grid.Column="2"
-                            Width="60"
-                            Height="38"
-                            Margin="-200,0,0,0"
-                            HorizontalContentAlignment="Center"
-                            VerticalContentAlignment="Center"
-                            Background="#FAFAFA"
-                            BorderBrush="#CCCCCC"
-                            BorderThickness="1"
-                            CornerRadius="10"
-                            FontSize="14"
-                            Text="{Binding ZoomIRValue}" />
-
-                        <Button
-                            Grid.Row="0"
-                            Grid.Column="3"
-                            Height="35"
-                            Margin="-120,0,0,0"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding ZoomInIRCommand}"
-                            Content="Zoom In"
-                            CornerRadius="10" />
-
-                        <Button
-                            Grid.Row="0"
-                            Grid.Column="4"
-                            Height="35"
-                            Margin="-110,0,0,0"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding ZoomOutIRCommand}"
-                            Content="Zoom Out"
-                            CornerRadius="10" />
-
-                        <Button
-                            Grid.Row="0"
-                            Grid.Column="4"
-                            Height="35"
-                            Margin="20,0,0,0"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding IRNarrowFOVCommand}"
-                            Content="Narrow FOV"
-                            CornerRadius="10" />
-
-                        <Button
-                            Grid.Row="0"
-                            Grid.Column="5"
-                            Height="35"
-                            Margin="20,0,0,0"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding IRWideFOVCommand}"
-                            Content="Wide FOV"
-                            CornerRadius="10" />
-
-                        <TextBox
-                            Grid.Row="1"
-                            Grid.Column="2"
-                            Width="60"
-                            Height="38"
-                            Margin="-200,20,0,0"
-                            HorizontalContentAlignment="Center"
-                            VerticalContentAlignment="Center"
-                            Background="#FAFAFA"
-                            BorderBrush="#CCCCCC"
-                            BorderThickness="1"
-                            CornerRadius="10"
-                            FontSize="14"
-                            Text="{Binding IRAbsoluteZoomValue}" />
-
-                        <Button
-                            Grid.Row="1"
-                            Grid.Column="3"
-                            Height="35"
-                            Margin="-120,20,0,0"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding IRAbsoluteZoomCommand}"
-                            Content="Zoom"
-                            CornerRadius="10" />
-
-                        <TextBox
-                            Grid.Row="2"
-                            Grid.Column="2"
-                            Width="60"
-                            Height="38"
-                            Margin="-200,20,0,0"
-                            HorizontalContentAlignment="Center"
-                            VerticalContentAlignment="Center"
-                            Background="#FAFAFA"
-                            BorderBrush="#CCCCCC"
-                            BorderThickness="1"
-                            CornerRadius="10"
-                            FontSize="14"
-                            Text="{Binding IRDigitalZoomValue}" />
-
-                        <Button
-                            Grid.Row="2"
-                            Grid.Column="3"
-                            Height="35"
-                            Margin="-120,20,0,0"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding IRDigitalZoomCommand}"
-                            Content="D-Zoom"
-                            CornerRadius="10" />
-
-                        <TextBox
-                            Grid.Row="1"
-                            Grid.Column="3"
-                            Width="60"
-                            Height="38"
-                            Margin="50,20,0,0"
-                            HorizontalContentAlignment="Center"
-                            VerticalContentAlignment="Center"
-                            Background="#FAFAFA"
-                            BorderBrush="#CCCCCC"
-                            BorderThickness="1"
-                            CornerRadius="10"
-                            FontSize="14"
-                            Text="{Binding FocusIRValue}" />
-
-                        <Button
-                            Grid.Row="1"
-                            Grid.Column="4"
-                            Width="100"
-                            Height="35"
-                            Margin="20,20,0,0"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding FocusIRCommand}"
-                            Content="Focus"
-                            CornerRadius="10" />
-
-                        <Button
-                            Grid.Row="1"
-                            Grid.Column="5"
-                            Height="35"
-                            Margin="20,20,0,0"
-                            HorizontalContentAlignment="Center"
-                            Command="{Binding AutoFocusIRCommand}"
-                            Content="Auto Focus"
-                            CornerRadius="10" />
-
-                    </Grid>
-                </Border>
-
-                <Border
-                    Grid.Row="4"
-                    Width="800"
-                    Height="50"
-                    Margin="0,0,0,0"
-                    Padding="20"
-                    HorizontalAlignment="Left"
-                    Background="White"
-                    BorderThickness="1"
-                    CornerRadius="20">
-
-                    <StackPanel
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Orientation="Horizontal"
-                        Spacing="10">
-
-                        <TextBox
-                            x:Name="tcpSentTextBox"
-                            Width="700"
-                            Height="30"
-                            Padding="8"
-                            AcceptsReturn="True"
-                            Background="#F4F4F4"
-                            BorderBrush="#888"
-                            BorderThickness="1"
-                            FontFamily="Consolas"
-                            FontSize="14"
-                            IsReadOnly="True"
-                            Text="{Binding TcpSent}"
-                            TextWrapping="Wrap" />
-
+            <!--  Right: Speed & Filters  -->
+            <Border Grid.Column="1" Classes="Card">
+                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,Auto,*" VerticalAlignment="Center">
+                    
+                    <!-- Speed Controls -->
+                    <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Spacing="10" Margin="0,0,0,20">
+                        <TextBlock Classes="Label" Text="Tilt Speed" />
+                        <TextBox Width="80" Text="{Binding TiltSpeed}" />
                     </StackPanel>
-                </Border>
 
-                <Border
-                    Grid.Row="5"
-                    Width="800"
-                    Height="100"
-                    Margin="0,-5,0,0"
-                    Padding="20"
-                    HorizontalAlignment="Left"
-                    Background="White"
-                    BorderThickness="1"
-                    CornerRadius="20">
-
-                    <StackPanel
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Orientation="Horizontal"
-                        Spacing="10">
-
-                        <ScrollViewer
-                        Width="700"
-                        Height="100"
-                        HorizontalScrollBarVisibility="Auto"
-                        VerticalScrollBarVisibility="Auto">
-
-							<TextBox
-                            x:Name="tcpReplyTextBox"
-                            Width="700"
-                            Height="100"
-                            Padding="8"
-                            AcceptsReturn="True"
-                            Background="#F4F4F4"
-                            BorderBrush="#888"
-                            BorderThickness="1"
-                            FontFamily="Consolas"
-                            FontSize="14"
-                            IsReadOnly="True"
-                            Text="{Binding TcpReply}"
-                            TextWrapping="Wrap" />
-
-                        </ScrollViewer>
+                    <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="10" Margin="20,0,0,20">
+                        <TextBlock Classes="Label" Text="Pan Speed" />
+                        <TextBox Width="80" Text="{Binding PanSpeed}" />
                     </StackPanel>
-                </Border>
+
+                    <!-- Filter Buttons -->
+                    <StackPanel Grid.Row="1" Grid.ColumnSpan="3" Orientation="Horizontal" Spacing="20" HorizontalAlignment="Left" Margin="0 30 0 0">
+                        <Button Command="{Binding EnableFilterCommand}" Content="Enable Filters" Width="120"/>
+                        <Button Command="{Binding DisableFilterCommand}" Content="Disable Filters" Width="120"/>
+                        <Button Command="{Binding DefaultFilterCommand}" Content="Set Default" Width="120"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!--  Row 3: DTV Controls  -->
+        <Border Grid.Row="3" Classes="Card">
+            <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*">
+                
+                <!-- Header -->
+                <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center" Margin="0,0,20,0">
+                    <TextBlock Classes="Label" Text="DTV" FontSize="16"/>
+                    <TextBlock Text="*zoom (28 ~ 980)" FontSize="10" Foreground="Red"/>
+                </StackPanel>
+
+                <!-- Current Value -->
+                <TextBlock Grid.Row="0" Grid.Column="1" Classes="Label" Text="{Binding ZoomDefaultDTVValue}" Margin="0,0,20,0" Width="50"/>
+
+                <!-- Zoom Step -->
+                <TextBox Grid.Row="0" Grid.Column="2" Width="60" Text="{Binding ZoomDTVValue}" Margin="0,0,10,0"/>
+
+                <!-- Zoom Buttons -->
+                <Button Grid.Row="0" Grid.Column="3" Command="{Binding ZoomInDTVCommand}" Content="Zoom In" Margin="0,0,10,0"/>
+                <Button Grid.Row="0" Grid.Column="4" Command="{Binding ZoomOutDTVCommand}" Content="Zoom Out" Margin="0,0,20,0"/>
+
+                <!-- FOV Buttons -->
+                <StackPanel Grid.Row="0" Grid.Column="5" Orientation="Horizontal" Spacing="10">
+                    <Button Command="{Binding DTVNarrowFOVCommand}" Content="Narrow FOV"/>
+                    <Button Command="{Binding DTVWideFOVCommand}" Content="Wide FOV" Width="97"/>
+                </StackPanel>
+
+                <!-- Row 2: Absolute Zoom & Focus -->
+                 <TextBox Grid.Row="1" Grid.Column="2" Width="60" Text="{Binding DTVAbsoluteZoomValue}" Margin="0,15,10,0"/>
+                 <Button Grid.Row="1" Grid.Column="3" Command="{Binding DTVAbsoluteZoomCommand}" Content="Zoom" Margin="0,15,10,0" Width="72"/>
+                 
+                 <TextBox Grid.Row="1" Grid.Column="4" Width="60" Text="{Binding FocusDTVValue}" Margin="0,15,0,0"/>
+                 <StackPanel Grid.Row="1" Grid.Column="5" Orientation="Horizontal" Spacing="10" Margin="0,15,0,0">
+                     <Button Command="{Binding FocusDTVCommand}" Content="Focus" Width="100"/>
+                     <Button Command="{Binding AutoFocusDTVCommand}" Content="Auto Focus" Width="100"/>
+                 </StackPanel>
 
             </Grid>
         </Border>
+
+        <!--  Row 4: IR Controls  -->
+        <Border Grid.Row="4" Classes="Card">
+             <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*">
+                
+                <!-- Header -->
+                <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center" Margin="0,0,20,0">
+                    <TextBlock Classes="Label" Text="IR" FontSize="16"/>
+                    <TextBlock Text="*zoom (24,194 ~ 37,801)" FontSize="10" Foreground="Red"/>
+                </StackPanel>
+
+                <!-- Current Value -->
+                <TextBlock Grid.Row="0" Grid.Column="1" Classes="Label" Text="{Binding ZoomDefaultIRValue}" Margin="0,0,20,0" Width="50"/>
+
+                <!-- Zoom Step -->
+                <TextBox Grid.Row="0" Grid.Column="2" Width="60" Text="{Binding ZoomIRValue}" Margin="0,0,10,0"/>
+
+                <!-- Zoom Buttons -->
+                <Button Grid.Row="0" Grid.Column="3" Command="{Binding ZoomInIRCommand}" Content="Zoom In" Margin="0,0,10,0"/>
+                <Button Grid.Row="0" Grid.Column="4" Command="{Binding ZoomOutIRCommand}" Content="Zoom Out" Margin="0,0,20,0"/>
+
+                <!-- FOV Buttons -->
+                <StackPanel Grid.Row="0" Grid.Column="5" Orientation="Horizontal" Spacing="10">
+                    <Button Command="{Binding IRNarrowFOVCommand}" Content="Narrow FOV"/>
+                    <Button Command="{Binding IRWideFOVCommand}" Content="Wide FOV" Width="97"/>
+                </StackPanel>
+
+                <!-- Row 2: Absolute Zoom & Focus -->
+                 <TextBox Grid.Row="1" Grid.Column="2" Width="60" Text="{Binding IRAbsoluteZoomValue}" Margin="0,15,10,0"/>
+                 <Button Grid.Row="1" Grid.Column="3" Command="{Binding IRAbsoluteZoomCommand}" Content="Zoom" Margin="0,15,10,0" Width="72"/>
+                 
+                 <TextBox Grid.Row="1" Grid.Column="4" Width="60" Text="{Binding FocusIRValue}" Margin="0,15,0,0"/>
+                 <StackPanel Grid.Row="1" Grid.Column="5" Orientation="Horizontal" Spacing="10" Margin="0,15,0,0">
+                     <Button Command="{Binding FocusIRCommand}" Content="Focus" Width="100"/>
+                     <Button Command="{Binding AutoFocusIRCommand}" Content="Auto Focus" Width="100"/>
+                 </StackPanel>
+
+                 <!-- Row 3: Digital Zoom -->
+                 <TextBox Grid.Row="2" Grid.Column="2" Width="60" Text="{Binding IRDigitalZoomValue}" Margin="0,15,10,0"/>
+                 <Button Grid.Row="2" Grid.Column="3" Command="{Binding IRDigitalZoomCommand}" Content="D-Zoom" Margin="0,15,10,0"/>
+
+            </Grid>
+        </Border>
+
+        <!--  Row 5: Logs  -->
+        <Grid Grid.Row="5" RowDefinitions="*,*" Margin="0,0,0,0">
+            <TextBox
+                Grid.Row="0"
+                Height="40"
+                Margin="0,0,0,10"
+                FontFamily="Consolas"
+                IsReadOnly="True"
+                Text="{Binding TcpSent}" />
+
+            <TextBox
+                Grid.Row="1"
+                Height="100"
+                AcceptsReturn="True"
+                FontFamily="Consolas"
+                IsReadOnly="True"
+                Text="{Binding TcpReply}"
+                TextWrapping="Wrap" />
+        </Grid>
 
     </Grid>
 </UserControl>
